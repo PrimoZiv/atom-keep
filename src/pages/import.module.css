@@ -1,0 +1,35 @@
+.container {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  padding: 30px 100px 60px;
+}
+
+.step {
+  margin-bottom: 20px;
+  padding: 0 40px;
+}
+
+.format {
+  height: calc(100% - 60px);
+  padding-right: 10px;
+  overflow-y: auto;
+}
+
+.nextStep {
+  margin-top: 20px;
+  float: right;
+}
+
+.preview {
+  height: calc(100% - 60px);
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+}
+
+.previewItem {
+  height: 100%;
+  overflow-y: auto;
+  padding: 10px;
+}

@@ -15,7 +15,8 @@ function App() {
   const [store, dispatch] = useReducer(reducer, {
     data: null,
     dataDir: "",
-    page: "",
+    page: "import",
+    outgoMap: {},
   });
   const { data, page } = store;
   const fetchData = () => {
@@ -26,14 +27,16 @@ function App() {
 
   useEffect(() => {
     ipcRenderer.invoke("init").then((res) => {
-      const { data, dataDir } = res;
-      dispatch({ type: "dataDir", payload: dataDir });
+      const { data, dataDir, outgoMap } = res;
+      const dispatchData = {
+        data,
+        dataDir,
+        outgoMap,
+      };
       if (!data) {
-        dispatch({ type: "page", payload: "settings" });
-      } else {
-        dispatch({ type: "data", payload: data });
-        dispatch({ type: "page", payload: "chart" });
+        dispatchData.page = "settings";
       }
+      dispatch({ type: "init", payload: dispatchData });
     });
   }, []);
 
@@ -46,7 +49,7 @@ function App() {
   };
 
   const getPage = () => {
-    let c = <div className="spin">无数据</div>;
+    let c = null;
     switch (page) {
       case "import":
         c = <Import />;
@@ -57,6 +60,8 @@ function App() {
       case "chart":
         if (data) {
           c = <Chart />;
+        } else {
+          c = <div className="spin">无数据</div>;
         }
         break;
       default:

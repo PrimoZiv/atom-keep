@@ -3,6 +3,7 @@ const { app, BrowserWindow, ipcMain } = require("electron");
 const isDev = require("electron-is-dev");
 const Store = require("electron-store");
 const getData = require("../lib/get-data");
+const initStore = require("../lib/init-store");
 
 const store = new Store();
 
@@ -24,6 +25,8 @@ function createWindow() {
 
   // win.webContents.openDevTools();
 
+  initStore(store);
+
   ipcMain.on("data-dir", (e, arg) => {
     if (arg && typeof arg === "string") {
       store.set("dataDir", arg);
@@ -38,9 +41,11 @@ function createWindow() {
   ipcMain.handle("init", async () => {
     const dataDir = store.get("dataDir");
     const data = await getData(dataDir);
+    const outgoMap = store.get("outgoMap");
     return {
       dataDir,
-      data
+      outgoMap,
+      data,
     };
   });
 }

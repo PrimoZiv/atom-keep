@@ -1,6 +1,10 @@
 export default function reducer(state, action) {
-  console.log(action);
   switch (action.type) {
+    case 'init':
+      return {
+        ...state,
+        ...action.payload
+      };
     case "data":
       return { ...state, data: action.payload };
     case "dataDir":
