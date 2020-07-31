@@ -1,7 +1,10 @@
 const path = require("path");
 const { app, BrowserWindow, ipcMain } = require("electron");
 const isDev = require("electron-is-dev");
-const getData = require('../lib/get-data');
+const Store = require("electron-store");
+const getData = require("../lib/get-data");
+
+const store = new Store();
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -21,9 +24,24 @@ function createWindow() {
 
   // win.webContents.openDevTools();
 
-  ipcMain.handle("web-ready", async () => {
-    const data = await getData();
+  ipcMain.on("data-dir", (e, arg) => {
+    if (arg && typeof arg === "string") {
+      store.set("dataDir", arg);
+    }
+  });
+
+  ipcMain.handle("fetch-data", async () => {
+    const data = await getData(store.get("dataDir"));
     return data;
+  });
+
+  ipcMain.handle("init", async () => {
+    const dataDir = store.get("dataDir");
+    const data = await getData(dataDir);
+    return {
+      dataDir,
+      data
+    };
   });
 }
 

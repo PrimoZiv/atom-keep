@@ -14,3 +14,9 @@ html, body, #root {
   align-items: center;
   justify-content: center;
 }
+.spin {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
