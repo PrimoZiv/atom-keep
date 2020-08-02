@@ -1,8 +1,10 @@
 import React, { useRef, useEffect, useState, useMemo, useContext } from "react";
 import echarts from "echarts";
-import { Radio } from "antd";
+import { Radio, Divider } from "antd";
 import StoreContext from "../modules/context";
 import { getOptions } from "../modules/chart";
+
+import style from "./chart.module.css";
 
 export default function Chart() {
   const { store } = useContext(StoreContext);
@@ -47,50 +49,56 @@ export default function Chart() {
 
   return (
     <div>
-      <div>
-        维度选择：
-        <Radio.Group
-          onChange={(e) => setDimension(e.target.value)}
-          value={dimension}
-        >
-          {[
-            { label: "年", value: "year" },
-            { label: "月", value: "month" },
-            { label: "日", value: "day" },
-          ].map((o) => (
-            <Radio key={o.value} value={o.value}>
-              {o.label}
-            </Radio>
-          ))}
-        </Radio.Group>
-      </div>
-      {dimension !== "year" ? (
+      <div className={style.filter}>
         <div>
-          年：
-          <Radio.Group onChange={(e) => setYear(e.target.value)} value={+year}>
-            {yearOptions.map((o) => (
-              <Radio key={o.value} value={o.value}>
-                {o.label}
-              </Radio>
-            ))}
-          </Radio.Group>
-        </div>
-      ) : null}
-      {dimension === "day" ? (
-        <div>
-          月：
+          维度选择：
           <Radio.Group
-            onChange={(e) => setMonth(e.target.value)}
-            value={+month}
+            onChange={(e) => setDimension(e.target.value)}
+            value={dimension}
           >
-            {monthOptions.map((o) => (
+            {[
+              { label: "年", value: "year" },
+              { label: "月", value: "month" },
+              { label: "日", value: "day" },
+            ].map((o) => (
               <Radio key={o.value} value={o.value}>
                 {o.label}
               </Radio>
             ))}
           </Radio.Group>
         </div>
-      ) : null}
+        {dimension !== "year" ? (
+          <div>
+            年：
+            <Radio.Group
+              onChange={(e) => setYear(e.target.value)}
+              value={+year}
+            >
+              {yearOptions.map((o) => (
+                <Radio key={o.value} value={o.value}>
+                  {o.label}
+                </Radio>
+              ))}
+            </Radio.Group>
+          </div>
+        ) : null}
+        {dimension === "day" ? (
+          <div>
+            月：
+            <Radio.Group
+              onChange={(e) => setMonth(e.target.value)}
+              value={+month}
+            >
+              {monthOptions.map((o) => (
+                <Radio key={o.value} value={o.value}>
+                  {o.label}
+                </Radio>
+              ))}
+            </Radio.Group>
+          </div>
+        ) : null}
+      </div>
+      <Divider />
       <div style={{ width: "100%", height: "600px" }} ref={ref} />
     </div>
   );

@@ -15,7 +15,7 @@ function App() {
   const [store, dispatch] = useReducer(reducer, {
     data: null,
     dataDir: "",
-    page: "import",
+    page: "chart",
     outgoMap: {},
   });
   const { data, page } = store;
@@ -75,6 +75,7 @@ function App() {
         <Sider className="sider" width={70}>
           <Menu selectedKeys={[page]} onClick={handleMenu}>
             <Menu.Item key="chart">图表</Menu.Item>
+            <Menu.Item key="data">数据</Menu.Item>
             <Menu.Item key="import">导入</Menu.Item>
             <Menu.Item key="settings">设置</Menu.Item>
           </Menu>

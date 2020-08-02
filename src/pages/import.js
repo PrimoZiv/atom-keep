@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
-import { Input, Radio, Steps, Table, Select, Divider, Button } from "antd";
+import { Input, Radio, Steps, Table, Select, Divider, Button, message } from "antd";
 
-import { icbcAdapter, smbAdapter, getPureData } from "./import.adapter";
+import { icbcAdapter, smbAdapter, wechatAdapter, alipayAdapter } from "./import.adapter";
 import { outgoOptions, incomeOptions } from "./import.config";
 import StoreContext from "../modules/context";
 
@@ -9,6 +9,7 @@ import style from "./import.module.css";
 import dayjs from "dayjs";
 
 const { Step } = Steps;
+const { ipcRenderer } = window.electron;
 
 export default () => {
   const { store } = useContext(StoreContext);
@@ -26,6 +27,10 @@ export default () => {
       res = icbcAdapter(raw, outgoMap);
     } else if (v === "smb") {
       res = smbAdapter(raw, outgoMap);
+    } else if (v === "wechat") {
+      res = wechatAdapter(raw, outgoMap);
+    } else if (v === "alipay") {
+      res = alipayAdapter(raw, outgoMap);
     }
     const { outgo, income } = res;
     setOutData(outgo);
@@ -44,6 +49,21 @@ export default () => {
       ...newData[row],
       [field]: v,
     };
+    if (type === "outgo") {
+      setOutData(newData);
+    } else {
+      setInData(newData);
+    }
+  };
+
+  const removeRow = (type, row) => {
+    let newData;
+    if (type === "outgo") {
+      newData = [...outData];
+    } else {
+      newData = [...inData];
+    }
+    newData.splice(row, 1);
     if (type === "outgo") {
       setOutData(newData);
     } else {
@@ -111,10 +131,31 @@ export default () => {
           );
         },
       },
+      {
+        title: "操作",
+        dataIndex: "id",
+        key: "operate",
+        render: (v, record, index) => {
+          return <Button onClick={() => removeRow(type, index)}>删除</Button>;
+        },
+      },
     ];
   };
 
-  const handleSubmit = () => {};
+  const handleSubmit = () => {
+    const cateMap = {};
+    outData.forEach((o) => {
+      if (o.category) {
+        cateMap[o.target] = o.category;
+      }
+    });
+    ipcRenderer
+      .invoke("import-data", { outgo: outData, income: inData }, cateMap)
+      .then((res) => {
+        message.success('提交成功');
+        setStep(0);
+      });
+  };
 
   return (
     <div className={style.container}>
@@ -137,8 +178,10 @@ export default () => {
           <div style={{ marginTop: "20px" }}>
             选择类别：
             <Radio.Group onChange={(e) => handleType(e.target.value)}>
-              <Radio value="icbc">工商</Radio>
-              <Radio value="cmb">招商</Radio>
+              <Radio value="icbc">工商银行</Radio>
+              <Radio value="cmb">招商银行</Radio>
+              <Radio value="wechat">微信账单</Radio>
+              <Radio value="alipay">支付宝账单</Radio>
             </Radio.Group>
           </div>
         </div>
@@ -175,10 +218,10 @@ export default () => {
         <>
           <div className={style.preview}>
             <pre className={style.previewItem}>
-              {JSON.stringify(getPureData(inData), null, 2)}
+              {JSON.stringify(inData, null, 2)}
             </pre>
             <pre className={style.previewItem}>
-              {JSON.stringify(getPureData(outData), null, 2)}
+              {JSON.stringify(outData, null, 2)}
             </pre>
           </div>
           <Button

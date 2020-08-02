@@ -4,6 +4,7 @@ const isDev = require("electron-is-dev");
 const Store = require("electron-store");
 const getData = require("../lib/get-data");
 const initStore = require("../lib/init-store");
+const importData = require("../lib/import-data");
 
 const store = new Store();
 
@@ -47,6 +48,16 @@ function createWindow() {
       outgoMap,
       data,
     };
+  });
+
+  ipcMain.handle("import-data", async (e, data, cateMap) => {
+    const dataDir = store.get("dataDir");
+    const outgoMap = store.get("outgoMap");
+    store.set("outgoMap", {
+      ...outgoMap,
+      ...cateMap,
+    });
+    return Promise.resolve(importData(dataDir, data));
   });
 }
 
