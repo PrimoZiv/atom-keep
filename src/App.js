@@ -1,6 +1,7 @@
 import React, { useEffect, useReducer } from "react";
 import { Layout, Menu } from "antd";
 import Chart from "./pages/chart";
+import Data from "./pages/data";
 import Import from "./pages/import";
 import Settings from "./pages/settings";
 import StoreContext from "./modules/context";
@@ -53,6 +54,9 @@ function App() {
     switch (page) {
       case "import":
         c = <Import />;
+        break;
+      case "data":
+        c = <Data />;
         break;
       case "settings":
         c = <Settings refresh={handleRefresh} />;

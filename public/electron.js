@@ -5,6 +5,7 @@ const Store = require("electron-store");
 const getData = require("../lib/get-data");
 const initStore = require("../lib/init-store");
 const importData = require("../lib/import-data");
+const getRawData = require("../lib/get-raw-data");
 
 const store = new Store();
 
@@ -58,6 +59,11 @@ function createWindow() {
       ...cateMap,
     });
     return Promise.resolve(importData(dataDir, data));
+  });
+
+  ipcMain.handle("raw-data", async (e, params) => {
+    const dataDir = store.get("dataDir");
+    return Promise.resolve(getRawData(dataDir, params));
   });
 }
 
