@@ -67,6 +67,7 @@
       "category": "public.app-category.education"
     },
     "win": {
+      "icon": "public/favicon.ico",
       "target": [
         {
           "target": "nsis",
