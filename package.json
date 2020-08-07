@@ -63,6 +63,7 @@
       "buildResources": "assets"
     },
     "mac": {
+      "icon": "public/icon.icns",
       "category": "public.app-category.education"
     },
     "win": {
@@ -78,7 +79,8 @@
     "nsis": {
       "oneClick": false,
       "perMachine": false,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": true
     }
   }
 }
