@@ -151,7 +151,7 @@ export function alipayAdapter(raw, dataMap) {
     .split(/[\n\r]/)
     .forEach((t) => {
       const item = t.split(",");
-      const time = dayjs(item[3]).valueOf();
+      const time = dayjs(item[2]).valueOf();
       const fmt = {
         category: dataMap[item[7]] || guessCate(item[7]) || "",
         subCategory: "",

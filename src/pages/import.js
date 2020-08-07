@@ -1,7 +1,21 @@
 import React, { useState, useContext } from "react";
-import { Input, Radio, Steps, Table, Select, Divider, Button, message } from "antd";
+import {
+  Input,
+  Radio,
+  Steps,
+  Table,
+  Select,
+  Divider,
+  Button,
+  message,
+} from "antd";
 
-import { icbcAdapter, smbAdapter, wechatAdapter, alipayAdapter } from "./import.adapter";
+import {
+  icbcAdapter,
+  smbAdapter,
+  wechatAdapter,
+  alipayAdapter,
+} from "./import.adapter";
 import { outgoOptions, incomeOptions } from "./import.config";
 import StoreContext from "../modules/context";
 
@@ -11,7 +25,7 @@ import dayjs from "dayjs";
 const { Step } = Steps;
 const { ipcRenderer } = window.electron;
 
-export default () => {
+export default ({ refresh }) => {
   const { store } = useContext(StoreContext);
   const { outgoMap } = store;
   const [step, setStep] = useState(0);
@@ -152,8 +166,9 @@ export default () => {
     ipcRenderer
       .invoke("import-data", { outgo: outData, income: inData }, cateMap)
       .then((res) => {
-        message.success('提交成功');
+        message.success("提交成功");
         setStep(0);
+        refresh();
       });
   };
 

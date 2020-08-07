@@ -53,7 +53,7 @@ function App() {
     let c = null;
     switch (page) {
       case "import":
-        c = <Import />;
+        c = <Import refresh={handleRefresh} />;
         break;
       case "data":
         c = <Data />;

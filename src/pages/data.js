@@ -1,20 +1,24 @@
 import React, { useContext, useState, useEffect } from "react";
 import StoreContext from "../modules/context";
-import { Table, Select } from "antd";
+import { Table, Select, Divider } from "antd";
 import dayjs from "dayjs";
+
+import style from "./data.module.css";
 
 const { ipcRenderer } = window.electron;
 
 const Data = () => {
   const { store } = useContext(StoreContext);
   const { data } = store;
-  const [year, setYear] = useState(data[data.length - 1].label);
+  const [year, setYear] = useState(
+    data && data.length > 0 ? data[data.length - 1].label : ""
+  );
   const [month, setMonth] = useState("");
   const [outData, setOutData] = useState([]);
   const [inData, setInData] = useState([]);
   let yearOptions = [];
 
-  if (year) {
+  if (year && data) {
     const yearObj = data.find((d) => d.label === year);
     yearOptions = yearObj ? yearObj.children : [];
   }
@@ -47,31 +51,34 @@ const Data = () => {
   };
 
   return (
-    <div>
-      <Select
-        style={{ width: "100px" }}
-        value={year}
-        onChange={(v) => setYear(v)}
-      >
-        {data.map((d) => (
-          <Select.Option key={d.label} value={d.label}>
-            {d.label}
-          </Select.Option>
-        ))}
-      </Select>
-      年
-      <Select
-        style={{ width: "100px" }}
-        value={month}
-        onChange={(v) => setMonth(v)}
-      >
-        {yearOptions.map((d) => (
-          <Select.Option key={d.label} value={d.label}>
-            {d.label}
-          </Select.Option>
-        ))}
-      </Select>
-      月
+    <div className={style.container}>
+      <div className={style.header}>
+        <Select
+          style={{ width: "100px" }}
+          value={year}
+          onChange={(v) => setYear(v)}
+        >
+          {(data || []).map((d) => (
+            <Select.Option key={d.label} value={d.label}>
+              {d.label}
+            </Select.Option>
+          ))}
+        </Select>
+        年
+        <Select
+          style={{ width: "100px" }}
+          value={month}
+          onChange={(v) => setMonth(v)}
+        >
+          {yearOptions.map((d) => (
+            <Select.Option key={d.label} value={d.label}>
+              {d.label}
+            </Select.Option>
+          ))}
+        </Select>
+        月
+      </div>
+      <Divider />
       <Table rowKey="id" columns={getColumns()} dataSource={inData} />
       <Table rowKey="id" columns={getColumns()} dataSource={outData} />
     </div>
