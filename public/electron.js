@@ -6,6 +6,7 @@ const getData = require("../lib/get-data");
 const initStore = require("../lib/init-store");
 const importData = require("../lib/import-data");
 const getRawData = require("../lib/get-raw-data");
+const removeData = require("../lib/remove-data");
 
 const store = new Store();
 
@@ -48,7 +49,7 @@ function createWindow() {
       dataDir,
       outgoMap,
       data,
-      rawData
+      rawData,
     };
   });
 
@@ -65,6 +66,16 @@ function createWindow() {
   ipcMain.handle("raw-data", async (e, params) => {
     const dataDir = store.get("dataDir");
     return Promise.resolve(getRawData(dataDir, params));
+  });
+
+  ipcMain.handle("remove-data", (e, arg) => {
+    const dataDir = store.get("dataDir");
+    try {
+      removeData(dataDir, arg);
+    } catch (e) {
+      console.log(e);
+    }
+    return Promise.resolve();
   });
 }
 

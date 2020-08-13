@@ -12,6 +12,7 @@ import {
   DatePicker,
   message,
   Popconfirm,
+  Space,
 } from "antd";
 import moment from "moment";
 import { outgoTypes, incomeTypes } from "../contants";
@@ -52,8 +53,24 @@ const Data = ({ refresh }) => {
     }
   }, [rawData, year, month]);
 
-  const handleDelete = (id) => {
-    console.log(id);
+  useEffect(() => {
+    const lastYear = rawData[rawData.length - 1];
+    if (!lastYear) {
+      return;
+    }
+    const day = lastYear.outgo[lastYear.outgo.length - 1].time;
+    if (day) {
+      const date = new Date(day);
+      setYear(date.getFullYear());
+      setMonth(date.getMonth() + 1);
+    }
+  }, [rawData]);
+
+  const handleDelete = (year, type, id) => {
+    ipcRenderer.invoke("remove-data", { year, type, id }).then(() => {
+      message.success("删除成功");
+      refresh();
+    });
   };
 
   const getColumns = (type) => {
@@ -88,7 +105,10 @@ const Data = ({ refresh }) => {
         dataIndex: "id",
         render: (v) => {
           return (
-            <Popconfirm title="确认删除" onConfirm={() => handleDelete(v)}>
+            <Popconfirm
+              title="确认删除"
+              onConfirm={() => handleDelete(year, type, v)}
+            >
               <Button>删除</Button>
             </Popconfirm>
           );
@@ -100,6 +120,7 @@ const Data = ({ refresh }) => {
   const handleType = (e) => {
     const options = e.target.value === "income" ? incomeTypes : outgoTypes;
     setOptions(options);
+    form.setFieldsValue({ category: "" });
   };
 
   const onSubmit = () => {
@@ -119,6 +140,7 @@ const Data = ({ refresh }) => {
       ipcRenderer.invoke("import-data", data, {}).then((res) => {
         message.success("提交成功");
         form.resetFields();
+        setOptions(incomeTypes);
         setModal(false);
         refresh();
       });
@@ -129,30 +151,36 @@ const Data = ({ refresh }) => {
     <div className={style.container}>
       <div className={style.header}>
         <div>
-          <Select
-            style={{ width: "100px" }}
-            value={year}
-            onChange={(v) => setYear(v)}
-          >
-            {(data || []).map((d) => (
-              <Select.Option key={d.label} value={d.label}>
-                {d.label}
-              </Select.Option>
-            ))}
-          </Select>
-          年
-          <Select
-            style={{ width: "100px" }}
-            value={month}
-            onChange={(v) => setMonth(v)}
-          >
-            {yearOptions.map((d) => (
-              <Select.Option key={d.label} value={d.label}>
-                {d.label}
-              </Select.Option>
-            ))}
-          </Select>
-          月
+          <Space>
+            <span>
+              <Select
+                style={{ width: "100px" }}
+                value={year}
+                onChange={(v) => setYear(v)}
+              >
+                {(data || []).map((d) => (
+                  <Select.Option key={d.label} value={d.label}>
+                    {d.label}
+                  </Select.Option>
+                ))}
+              </Select>
+              年
+            </span>
+            <span>
+              <Select
+                style={{ width: "100px" }}
+                value={month}
+                onChange={(v) => setMonth(v)}
+              >
+                {yearOptions.map((d) => (
+                  <Select.Option key={d.label} value={d.label}>
+                    {d.label}
+                  </Select.Option>
+                ))}
+              </Select>
+              月
+            </span>
+          </Space>
         </div>
         <div>
           <Button onClick={() => setModal(true)}>添加数据</Button>
