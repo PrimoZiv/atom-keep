@@ -15,12 +15,13 @@ import {
   smbAdapter,
   wechatAdapter,
   alipayAdapter,
+  boscAdapter,
 } from "./import.adapter";
 import { outgoOptions, incomeOptions } from "./import.config";
 import StoreContext from "../modules/context";
 
 import style from "./import.module.css";
-import dayjs from "dayjs";
+import moment from "moment";
 
 const { Step } = Steps;
 const { ipcRenderer } = window.electron;
@@ -41,6 +42,8 @@ export default ({ refresh }) => {
       res = icbcAdapter(raw, outgoMap);
     } else if (v === "smb") {
       res = smbAdapter(raw, outgoMap);
+    } else if (v === "bosc") {
+      res = boscAdapter(raw, outgoMap);
     } else if (v === "wechat") {
       res = wechatAdapter(raw, outgoMap);
     } else if (v === "alipay") {
@@ -107,7 +110,7 @@ export default ({ refresh }) => {
         title: "时间",
         dataIndex: "time",
         key: "time",
-        render: (v) => dayjs(v).format("YYYY-MM-DD"),
+        render: (v) => moment(v).format("YYYY-MM-DD"),
       },
       {
         title: "类别",
@@ -195,6 +198,7 @@ export default ({ refresh }) => {
             <Radio.Group onChange={(e) => handleType(e.target.value)}>
               <Radio value="icbc">工商银行</Radio>
               <Radio value="cmb">招商银行</Radio>
+              <Radio value="bosc">上海银行</Radio>
               <Radio value="wechat">微信账单</Radio>
               <Radio value="alipay">支付宝账单</Radio>
             </Radio.Group>

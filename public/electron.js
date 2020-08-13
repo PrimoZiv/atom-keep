@@ -42,12 +42,13 @@ function createWindow() {
 
   ipcMain.handle("init", async () => {
     const dataDir = store.get("dataDir");
-    const data = await getData(dataDir);
+    const { data, rawData } = await getData(dataDir);
     const outgoMap = store.get("outgoMap");
     return {
       dataDir,
       outgoMap,
       data,
+      rawData
     };
   });
 

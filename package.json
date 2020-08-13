@@ -11,10 +11,10 @@
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "antd": "^4.5.1",
-    "dayjs": "^1.8.31",
     "echarts": "^4.8.0",
     "electron-is-dev": "^1.2.0",
     "electron-store": "^6.0.0",
+    "moment": "^2.27.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1"

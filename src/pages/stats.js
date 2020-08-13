@@ -1,20 +1,22 @@
-import React, { useRef, useEffect, useState, useMemo, useContext } from "react";
+import React, { useState, useContext, useRef, useMemo, useEffect } from "react";
 import echarts from "echarts";
-import { Radio, Divider } from "antd";
+import { Divider, Radio } from "antd";
+
 import StoreContext from "../modules/context";
-import { getOptions } from "../modules/chart";
+import { getOptions } from "../modules/stats";
 
-import style from "./chart.module.css";
+import style from "./stats.module.css";
 
-export default function Chart() {
+const Stats = () => {
   const { store } = useContext(StoreContext);
-  const { data = [] } = store;
+  const { data } = store;
   const ref = useRef(null);
   const [myChart, setChart] = useState(null);
-  const [dimension, setDimension] = useState("year");
+  const [dimension, setDimension] = useState("all");
   const [year, setYear] = useState(
     data.length > 0 ? data[data.length - 1].label : ""
   );
+  const [month, setMonth] = useState("");
 
   const yearOptions = useMemo(() => {
     return data.map((y) => ({
@@ -22,10 +24,20 @@ export default function Chart() {
       value: y.label,
     }));
   }, [data]);
+  const monthOptions = useMemo(() => {
+    const options = [];
+    for (let i = 1; i <= 12; i++) {
+      options.push({
+        label: `${i}月`,
+        value: i,
+      });
+    }
+    return options;
+  }, []);
 
   useEffect(() => {
     var myChart = echarts.init(ref.current);
-    var option = getOptions(data, { dimension, year });
+    var option = getOptions(data, { dimension, year, month });
     myChart.setOption(option);
     setChart(myChart);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -33,10 +45,10 @@ export default function Chart() {
 
   useEffect(() => {
     if (myChart) {
-      var option = getOptions(data, { dimension, year });
+      var option = getOptions(data, { dimension, year, month });
       myChart.setOption(option);
     }
-  }, [myChart, dimension, year, data]);
+  }, [myChart, dimension, year, month, data]);
 
   return (
     <div>
@@ -48,6 +60,7 @@ export default function Chart() {
             value={dimension}
           >
             {[
+              { label: "全部数据", value: "all" },
               { label: "年", value: "year" },
               { label: "月", value: "month" },
             ].map((o) => (
@@ -57,19 +70,29 @@ export default function Chart() {
             ))}
           </Radio.Group>
         </div>
-        {dimension !== "year" ? (
+        {dimension !== "all" ? (
           <div>
             年份选择：
             <Radio.Group
               onChange={(e) => setYear(e.target.value)}
               value={+year}
             >
-              {dimension === "month" ? (
-                <Radio key="-1" value={-1}>
-                  全部
-                </Radio>
-              ) : null}
               {yearOptions.map((o) => (
+                <Radio key={o.value} value={o.value}>
+                  {o.label}
+                </Radio>
+              ))}
+            </Radio.Group>
+          </div>
+        ) : null}
+        {dimension === "month" ? (
+          <div>
+            月：
+            <Radio.Group
+              onChange={(e) => setMonth(e.target.value)}
+              value={+month}
+            >
+              {monthOptions.map((o) => (
                 <Radio key={o.value} value={o.value}>
                   {o.label}
                 </Radio>
@@ -82,4 +105,6 @@ export default function Chart() {
       <div style={{ width: "100%", height: "600px" }} ref={ref} />
     </div>
   );
-}
+};
+
+export default Stats;

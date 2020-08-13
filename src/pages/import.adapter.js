@@ -1,4 +1,4 @@
-import dayjs from "dayjs";
+import moment from "moment";
 
 const guessCate = (name) => {
   const types = [
@@ -71,6 +71,7 @@ const guessCate = (name) => {
   return "";
 };
 
+// 工商银行
 export function icbcAdapter(raw, dataMap) {
   const outgo = [];
   const income = [];
@@ -86,7 +87,7 @@ export function icbcAdapter(raw, dataMap) {
         target: item[4],
         amount: `¥${parseFloat(item[5])}`,
         account: "工商银行 信用卡",
-        time: dayjs(item[1]).valueOf(),
+        time: moment(item[1]).valueOf(),
         remark: "",
       };
       if (item[6].includes("支出")) {
@@ -103,7 +104,36 @@ export function icbcAdapter(raw, dataMap) {
   };
 }
 
+// 招商银行
 export function smbAdapter() {}
+
+// 上海银行
+export function boscAdapter(raw, dataMap) {
+  const outgo = [];
+  const income = [];
+
+  raw
+    .trim()
+    .split(/[\n\r]/)
+    .forEach((t) => {
+      const item = t.split(",");
+      const fmt = {
+        category: dataMap[item[2]] || guessCate(item[2]) || "",
+        subCategory: "",
+        target: item[2],
+        amount: `¥${parseFloat(item[1])}`,
+        account: "美团信用卡",
+        time: moment(item[0]).valueOf(),
+        remark: "",
+      };
+      fmt.id = outgo.length;
+      outgo.push(fmt);
+    });
+  return {
+    outgo: outgo.sort((a, b) => a.time - b.time),
+    income: income.sort((a, b) => a.time - b.time),
+  };
+}
 
 export function wechatAdapter(raw, dataMap) {
   const outgo = [];
@@ -124,7 +154,7 @@ export function wechatAdapter(raw, dataMap) {
         target: item[2],
         amount: `¥${parseFloat(item[5].replace("¥", ""))}`,
         account: accountMap[item[6]],
-        time: dayjs(item[0]).valueOf(),
+        time: moment(item[0]).valueOf(),
         remark: "",
       };
       if (item[4].includes("支出")) {
@@ -151,7 +181,7 @@ export function alipayAdapter(raw, dataMap) {
     .split(/[\n\r]/)
     .forEach((t) => {
       const item = t.split(",");
-      const time = dayjs(item[2]).valueOf();
+      const time = moment(item[2]).valueOf();
       const fmt = {
         category: dataMap[item[7]] || guessCate(item[7]) || "",
         subCategory: "",
