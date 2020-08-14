@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState, useMemo, useContext } from "react";
 import echarts from "echarts";
 import { Radio, Divider } from "antd";
 import StoreContext from "../modules/context";
-import { getOptions } from "../modules/chart";
+import { getOptions } from "../modules/chart.option";
 
 import style from "./chart.module.css";
 

@@ -16,7 +16,7 @@ import {
 } from "antd";
 import moment from "moment";
 import { outgoTypes, incomeTypes } from "../contants";
-import getRawData from "./data.get";
+import getRawData from "../modules/data.get";
 
 import style from "./data.module.css";
 import Modal from "antd/lib/modal/Modal";

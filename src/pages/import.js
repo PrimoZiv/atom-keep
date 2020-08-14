@@ -16,8 +16,8 @@ import {
   wechatAdapter,
   alipayAdapter,
   boscAdapter,
-} from "./import.adapter";
-import { outgoOptions, incomeOptions } from "./import.config";
+} from "../modules/import.adapter";
+import { outgoOptions, incomeOptions } from "../modules/import.config";
 import StoreContext from "../modules/context";
 
 import style from "./import.module.css";

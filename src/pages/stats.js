@@ -3,7 +3,7 @@ import echarts from "echarts";
 import { Divider, Radio } from "antd";
 
 import StoreContext from "../modules/context";
-import { getOptions } from "../modules/stats";
+import { getOptions } from "../modules/stats.option";
 
 import style from "./stats.module.css";
 
@@ -12,11 +12,12 @@ const Stats = () => {
   const { data } = store;
   const ref = useRef(null);
   const [myChart, setChart] = useState(null);
-  const [dimension, setDimension] = useState("all");
+  const [dimension, setDimension] = useState("year");
   const [year, setYear] = useState(
     data.length > 0 ? data[data.length - 1].label : ""
   );
   const [month, setMonth] = useState("");
+  console.log(data);
 
   const yearOptions = useMemo(() => {
     return data.map((y) => ({
@@ -102,7 +103,7 @@ const Stats = () => {
         ) : null}
       </div>
       <Divider />
-      <div style={{ width: "100%", height: "600px" }} ref={ref} />
+      <div style={{ width: "100%", height: "400px" }} ref={ref} />
     </div>
   );
 };
