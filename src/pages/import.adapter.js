@@ -1,5 +1,7 @@
 import moment from "moment";
 
+const getAmount = (s) => parseFloat(s.replace(/(RMB|¥|\/|,)/g, ""));
+
 const guessCate = (name) => {
   const types = [
     [
@@ -85,7 +87,7 @@ export function icbcAdapter(raw, dataMap) {
         category: dataMap[item[4]] || guessCate(item[4]) || "",
         subCategory: "",
         target: item[4],
-        amount: `¥${parseFloat(item[5])}`,
+        amount: `¥${getAmount(item[5])}`,
         account: "工商银行 信用卡",
         time: moment(item[1]).valueOf(),
         remark: "",
@@ -121,7 +123,7 @@ export function boscAdapter(raw, dataMap) {
         category: dataMap[item[2]] || guessCate(item[2]) || "",
         subCategory: "",
         target: item[2],
-        amount: `¥${parseFloat(item[1])}`,
+        amount: `¥${getAmount(item[1])}`,
         account: "美团信用卡",
         time: moment(item[0]).valueOf(),
         remark: "",
@@ -152,7 +154,7 @@ export function wechatAdapter(raw, dataMap) {
         category: dataMap[item[2]] || guessCate(item[2]) || "",
         subCategory: "",
         target: item[2],
-        amount: `¥${parseFloat(item[5].replace("¥", ""))}`,
+        amount: `¥${getAmount(item[5].replace("¥", ""))}`,
         account: accountMap[item[6]],
         time: moment(item[0]).valueOf(),
         remark: "",
@@ -186,7 +188,7 @@ export function alipayAdapter(raw, dataMap) {
         category: dataMap[item[7]] || guessCate(item[7]) || "",
         subCategory: "",
         target: item[7],
-        amount: `¥${parseFloat(item[9].replace("¥", ""))}`,
+        amount: `¥${getAmount(item[9].replace("¥", ""))}`,
         account: time > t2015 ? "招商银行 信用卡" : "支付宝 余额宝",
         time,
         remark: "",
