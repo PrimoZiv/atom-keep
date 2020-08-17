@@ -98,7 +98,14 @@ const Data = ({ refresh }) => {
       },
       { title: "子类别", dataIndex: "subCategory" },
       { title: "账户", dataIndex: "account" },
-      { title: "金额", dataIndex: "amount" },
+      {
+        title: "金额",
+        dataIndex: "amount",
+        sorter: {
+          compare: (a, b) =>
+            +a.amount.replace("¥", "") - +b.amount.replace("¥", ""),
+        },
+      },
       { title: "备注", dataIndex: "remark" },
       {
         title: "操作",

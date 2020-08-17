@@ -1,4 +1,11 @@
-import React, { useState, useContext, useRef, useMemo, useEffect } from "react";
+import React, {
+  useState,
+  useContext,
+  useRef,
+  useMemo,
+  useEffect,
+  useCallback,
+} from "react";
 import echarts from "echarts";
 import { Divider, Radio } from "antd";
 
@@ -7,17 +14,17 @@ import { getOptions } from "../modules/stats.option";
 
 import style from "./stats.module.css";
 
+const chartWidth = window.innerWidth - 70;
+const chartHeight = window.innerHeight - 180;
+
 const Stats = () => {
   const { store } = useContext(StoreContext);
   const { data } = store;
   const ref = useRef(null);
   const [myChart, setChart] = useState(null);
   const [dimension, setDimension] = useState("year");
-  const [year, setYear] = useState(
-    data.length > 0 ? data[data.length - 1].label : ""
-  );
+  const [year, setYear] = useState("");
   const [month, setMonth] = useState("");
-  console.log(data);
 
   const yearOptions = useMemo(() => {
     return data.map((y) => ({
@@ -35,10 +42,44 @@ const Stats = () => {
     }
     return options;
   }, []);
+  const handleDimension = (e) => {
+    const dim = e.target.value;
+    if (dim === "month" && !year) {
+      setYear(data.length > 0 ? data[data.length - 1].label : "");
+    } else if (dim === "day") {
+      if (!year) {
+        setYear(data.length > 0 ? data[data.length - 1].label : "");
+      }
+      if (!month) {
+        setMonth(1);
+      }
+    }
+    setDimension(dim);
+  };
+  const handleChart = useCallback(
+    (e) => {
+      const option = getOptions(data, {
+        dimension,
+        year,
+        month,
+        dataIndex: e.dataIndex === undefined ? null : e.dataIndex,
+      });
+      if (option) {
+        console.log(option);
+        myChart.setOption(option, true);
+      }
+    },
+    [data, dimension, month, myChart, year]
+  );
 
   useEffect(() => {
-    var myChart = echarts.init(ref.current);
-    var option = getOptions(data, { dimension, year, month });
+    const myChart = echarts.init(ref.current);
+    const option = getOptions(data, {
+      dimension,
+      year,
+      month,
+      dataIndex: null,
+    });
     myChart.setOption(option);
     setChart(myChart);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -46,24 +87,31 @@ const Stats = () => {
 
   useEffect(() => {
     if (myChart) {
-      var option = getOptions(data, { dimension, year, month });
-      myChart.setOption(option);
+      const option = getOptions(data, { dimension, year, month });
+      if (option) {
+        console.log(option);
+        myChart.setOption(option, true);
+      }
     }
   }, [myChart, dimension, year, month, data]);
+
+  useEffect(() => {
+    if (myChart) {
+      myChart.off("updateAxisPointer");
+      myChart.on("updateAxisPointer", handleChart);
+    }
+  }, [myChart, handleChart]);
 
   return (
     <div>
       <div className={style.filter}>
         <div>
           维度选择：
-          <Radio.Group
-            onChange={(e) => setDimension(e.target.value)}
-            value={dimension}
-          >
+          <Radio.Group onChange={handleDimension} value={dimension}>
             {[
-              { label: "全部数据", value: "all" },
               { label: "年", value: "year" },
               { label: "月", value: "month" },
+              { label: "日", value: "day" },
             ].map((o) => (
               <Radio key={o.value} value={o.value}>
                 {o.label}
@@ -71,7 +119,7 @@ const Stats = () => {
             ))}
           </Radio.Group>
         </div>
-        {dimension !== "all" ? (
+        {dimension !== "year" ? (
           <div>
             年份选择：
             <Radio.Group
@@ -86,7 +134,7 @@ const Stats = () => {
             </Radio.Group>
           </div>
         ) : null}
-        {dimension === "month" ? (
+        {dimension === "day" ? (
           <div>
             月：
             <Radio.Group
@@ -103,7 +151,7 @@ const Stats = () => {
         ) : null}
       </div>
       <Divider />
-      <div style={{ width: "100%", height: "400px" }} ref={ref} />
+      <div ref={ref} style={{ width: chartWidth, height: chartHeight }} />
     </div>
   );
 };

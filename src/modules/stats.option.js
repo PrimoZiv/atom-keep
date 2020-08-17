@@ -1,46 +1,116 @@
-const colors = [
-  "#ccee66",
-  "#006699",
-  "#99cc33",
-  "#3399cc",
-  "#990066",
-  "#ff6600",
-  "#ff9900",
-  "#cc3399",
-  "#669900",
-  "#ffcc00",
-];
+const toFixed = (n) => +n.toFixed(2);
+
+const getCatesFromData = (data) => {
+  let tar = {};
+  let lab = [];
+  data.forEach((d) => {
+    const label = `${d.label}`;
+    const cates = d.categorys.outgo;
+    lab.push(label);
+    Object.keys(cates).forEach((c) => {
+      if (!tar[c]) {
+        tar[c] = [];
+      }
+      tar[c].push({
+        value: cates[c],
+        label,
+      });
+    });
+  });
+  return { tar, lab };
+};
+
+let dataCache = [];
+let paramsCache = {};
 
 export function getOptions(data, params) {
-  const { dimension, year, month } = params;
+  const { dimension, year, month, dataIndex } = params;
+
+  if (
+    data === dataCache &&
+    dimension === paramsCache.dimension &&
+    year === paramsCache.year &&
+    month === paramsCache.month &&
+    dataIndex === paramsCache.dataIndex
+  ) {
+    return null;
+  }
+  dataCache = data;
+  paramsCache = params;
+
   let target = {};
   let labels = [];
   switch (dimension) {
     case "year":
-      data.forEach((d) => {
-        const cates = d.categorys.outgo;
-        labels.push(d.label);
-        Object.keys(cates).forEach((c) => {
-          if (!target[c]) {
-            target[c] = [];
-          }
-          target[c].push({
-            value: cates[c],
-            label: d.label,
-          });
-        });
-      });
+      const { tar, lab } = getCatesFromData(data);
+      target = tar;
+      labels = lab;
       break;
     case "month":
+      if (year) {
+        const y = data.find((x) => x.label === year) || {};
+        const { tar, lab } = getCatesFromData(y.children || []);
+        target = tar;
+        labels = lab;
+      }
       break;
     case "day":
+      if (year && month) {
+        const y = data.find((x) => x.label === year) || {};
+        const m = (y.children || []).find((x) => x.label === month) || {};
+        const { tar, lab } = getCatesFromData(m.children || []);
+        target = tar;
+        labels = lab;
+      }
       break;
     default:
   }
-  console.log(target);
+
+  const keys = Object.keys(target);
+  const datasource = [["product", ...labels]];
+  const pieData = [];
+  keys.forEach((k) => {
+    const data = [];
+    const pie = {
+      name: k,
+      value: 0,
+    };
+    labels.forEach((l) => {
+      const t = target[k].find((x) => x.label === l);
+      data.push(t ? t.value : 0);
+    });
+    datasource.push([k, ...data]);
+    if (dataIndex != null) {
+      pie.value = toFixed(data[dataIndex]);
+    } else {
+      pie.value = toFixed(data.reduce((v1, v2) => v1 + v2));
+    }
+    pieData.push(pie);
+  });
+
+  pieData.sort((a, b) => b.value - a.value);
+  datasource.sort((a, b) => {
+    if (a[0] === "product") {
+      return -1;
+    }
+    if (b[0] === "product") {
+      return 1;
+    }
+    const a1 = a.slice(1).reduce((v1, v2) => v1 + v2);
+    const b1 = b.slice(1).reduce((v1, v2) => v1 + v2);
+    return b1 - a1;
+  });
+
   return {
-    color: colors,
-    legend: {},
+    legend: {
+      orient: "vertical",
+      left: "5%",
+      top: "20%",
+      itemGap: 20,
+    },
+    dataset: {
+      source: datasource,
+    },
     xAxis: {
       type: "category",
       axisTick: {
@@ -51,12 +121,20 @@ export function getOptions(data, params) {
     yAxis: {
       type: "value",
     },
+    grid: {
+      top: "300",
+      left: "240",
+      right: "100",
+    },
     tooltip: {
       trigger: "axis",
       formatter: function (params) {
         let str = "";
         params
-          .map((p) => ({ name: p.seriesName, value: p.value }))
+          .map((p) => ({
+            name: p.dimensionNames[p.seriesIndex + 1],
+            value: p.data[p.seriesIndex + 1],
+          }))
           .sort((a, b) => b.value - a.value)
           .forEach((p) => (str += `${p.name}: ${p.value}<br>`));
         return `<h3 style="color:white;">${params[0].name}</h3>${str}`;
@@ -65,16 +143,27 @@ export function getOptions(data, params) {
         animation: false,
       },
     },
-    series: Object.keys(target).map((k, i) => {
-      return {
-        data: labels.map((l) => {
-          const t = target[k].find((x) => x.label === l);
-          return t ? t.value : 0;
-        }),
-        type: "line",
-        name: k,
-        smooth: true,
-      };
-    }),
+    series: [
+      ...pieData.map((p, i) => {
+        return {
+          animation: false,
+          type: "line",
+          name: p.name,
+          smooth: true,
+          seriesLayoutBy: "row",
+        };
+      }),
+      {
+        type: "pie",
+        radius: "100",
+        center: ["50%", "170"],
+        label: {
+          formatter: "{b}: {c} ({d}%)",
+          fontSize: 16,
+          fontWeight: 600
+        },
+        data: pieData,
+      },
+    ],
   };
 }
