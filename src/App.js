@@ -20,7 +20,7 @@ function App() {
     rawData: [],
     accounts: [],
     dataDir: "",
-    page: "stats",
+    page: "chart",
     outgoMap: {},
   });
   const { data, page } = store;
