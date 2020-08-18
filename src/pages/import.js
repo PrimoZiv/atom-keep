@@ -23,6 +23,49 @@ import StoreContext from "../modules/context";
 import style from "./import.module.css";
 import moment from "moment";
 
+const types = {
+  icbc: {
+    name: "工商银行",
+    handle: icbcAdapter,
+    format: {
+      fields: ["", "时间", "", "", "商户", "金额", "收支", "", "", "", ""],
+      separator: "[tab]",
+    },
+  },
+  smb: {
+    name: "招商银行",
+    handle: smbAdapter,
+    format: {
+      fields: ["", "时间", "商户", "金额", "", "", "", "", "", "", ""],
+      separator: "",
+    },
+  },
+  bosc: {
+    name: "上海银行",
+    handle: boscAdapter,
+    format: {
+      fields: ["时间", "金额", "商户", "", "", "", "", "", "", "", ""],
+      separator: "csv [,]",
+    },
+  },
+  wechat: {
+    name: "微信账单",
+    handle: wechatAdapter,
+    format: {
+      fields: ["时间", "", "商户", "", "", "金额", "账户", "", "", "", ""],
+      separator: "csv [,]",
+    },
+  },
+  alipay: {
+    name: "支付宝账单",
+    handle: alipayAdapter,
+    format: {
+      fields: ["", "", "时间", "", "", "", "", "商户", "", "金额", "收支"],
+      separator: "csv [,]",
+    },
+  },
+};
+
 const { Step } = Steps;
 const { ipcRenderer } = window.electron;
 
@@ -30,25 +73,17 @@ export default ({ refresh }) => {
   const { store } = useContext(StoreContext);
   const { outgoMap } = store;
   const [step, setStep] = useState(0);
+  const [type, setType] = useState("");
   const [raw, setRaw] = useState("");
   const [outData, setOutData] = useState([]);
   const [inData, setInData] = useState([]);
-  const handleType = (v) => {
+
+  const handleData = () => {
     let res;
     if (!raw) {
       return;
     }
-    if (v === "icbc") {
-      res = icbcAdapter(raw, outgoMap);
-    } else if (v === "smb") {
-      res = smbAdapter(raw, outgoMap);
-    } else if (v === "bosc") {
-      res = boscAdapter(raw, outgoMap);
-    } else if (v === "wechat") {
-      res = wechatAdapter(raw, outgoMap);
-    } else if (v === "alipay") {
-      res = alipayAdapter(raw, outgoMap);
-    }
+    res = types[type].handle(raw, outgoMap);
     const { outgo, income } = res;
     setOutData(outgo);
     setInData(income);
@@ -195,13 +230,31 @@ export default ({ refresh }) => {
           />
           <div style={{ marginTop: "20px" }}>
             选择类别：
-            <Radio.Group onChange={(e) => handleType(e.target.value)}>
-              <Radio value="icbc">工商银行</Radio>
-              <Radio value="cmb">招商银行</Radio>
-              <Radio value="bosc">上海银行</Radio>
-              <Radio value="wechat">微信账单</Radio>
-              <Radio value="alipay">支付宝账单</Radio>
+            <Radio.Group onChange={(e) => setType(e.target.value)}>
+              {Object.keys(types).map((t) => (
+                <Radio key={t} value={t}>
+                  {types[t].name}
+                </Radio>
+              ))}
             </Radio.Group>
+          </div>
+          {type ? (
+            <div className={style.explain}>
+              <ul>
+                {types[type].format.fields.map((name, index) => (
+                  <li key={index}>
+                    <span>{index}</span>
+                    <span>{name}</span>
+                  </li>
+                ))}
+              </ul>
+              <p>分隔符: {types[type].format.separator}</p>
+            </div>
+          ) : null}
+          <div className={style.nextStep}>
+            <Button type="primary" onClick={handleData}>
+              下一步
+            </Button>
           </div>
         </div>
       ) : null}
