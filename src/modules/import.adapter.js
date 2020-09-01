@@ -1,6 +1,6 @@
 import moment from "moment";
 
-const getAmount = (s) => parseFloat(s.replace(/(RMB|¥|\/|,)/g, ""));
+const getAmount = (s) => parseFloat(s.replace(/(RMB|¥|\/|,|")/g, ""));
 
 const guessCate = (name) => {
   const types = [
@@ -73,6 +73,34 @@ const guessCate = (name) => {
   return "";
 };
 
+// 通用
+export function commonAdapter(raw, dataMap) {
+  const outgo = [];
+  const income = [];
+
+  raw
+    .trim()
+    .split(/[\n\r]/)
+    .forEach((t) => {
+      const item = t.split(",");
+      const fmt = {
+        category: item[2] || "",
+        subCategory: "",
+        target: item[2],
+        amount: `¥${getAmount(item[3])}`,
+        account: item[1],
+        time: moment(item[0]).valueOf(),
+        remark: item[4],
+      };
+      fmt.id = outgo.length;
+      outgo.push(fmt);
+    });
+  return {
+    outgo: outgo.sort((a, b) => a.time - b.time),
+    income: income.sort((a, b) => a.time - b.time),
+  };
+}
+
 // 工商银行
 export function icbcAdapter(raw, dataMap) {
   const outgo = [];
@@ -108,34 +136,6 @@ export function icbcAdapter(raw, dataMap) {
 
 // 招商银行
 export function smbAdapter() {}
-
-// 上海银行
-export function boscAdapter(raw, dataMap) {
-  const outgo = [];
-  const income = [];
-
-  raw
-    .trim()
-    .split(/[\n\r]/)
-    .forEach((t) => {
-      const item = t.split(",");
-      const fmt = {
-        category: dataMap[item[2]] || guessCate(item[2]) || "",
-        subCategory: "",
-        target: item[2],
-        amount: `¥${getAmount(item[1])}`,
-        account: "美团信用卡",
-        time: moment(item[0]).valueOf(),
-        remark: "",
-      };
-      fmt.id = outgo.length;
-      outgo.push(fmt);
-    });
-  return {
-    outgo: outgo.sort((a, b) => a.time - b.time),
-    income: income.sort((a, b) => a.time - b.time),
-  };
-}
 
 export function wechatAdapter(raw, dataMap) {
   const outgo = [];

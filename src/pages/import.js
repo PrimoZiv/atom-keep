@@ -15,7 +15,7 @@ import {
   smbAdapter,
   wechatAdapter,
   alipayAdapter,
-  boscAdapter,
+  commonAdapter,
 } from "../modules/import.adapter";
 import { outgoOptions, incomeOptions } from "../modules/import.config";
 import StoreContext from "../modules/context";
@@ -40,14 +40,6 @@ const types = {
       separator: "",
     },
   },
-  bosc: {
-    name: "上海银行",
-    handle: boscAdapter,
-    format: {
-      fields: ["时间", "金额", "商户", "", "", "", "", "", "", "", ""],
-      separator: "csv [,]",
-    },
-  },
   wechat: {
     name: "微信账单",
     handle: wechatAdapter,
@@ -61,6 +53,28 @@ const types = {
     handle: alipayAdapter,
     format: {
       fields: ["", "", "时间", "", "", "", "", "商户", "", "金额", "收支"],
+      separator: "csv [,]",
+    },
+  },
+  common: {
+    name: "通用（花呗，现金，上海银行）",
+    handle: commonAdapter,
+    format: {
+      fields: [
+        "时间",
+        "账户",
+        "类别",
+        "金额",
+        "备注",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+      ],
       separator: "csv [,]",
     },
   },

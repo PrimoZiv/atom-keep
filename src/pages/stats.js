@@ -65,7 +65,6 @@ const Stats = () => {
         dataIndex: e.dataIndex === undefined ? null : e.dataIndex,
       });
       if (option) {
-        console.log(option);
         myChart.setOption(option, true);
       }
     },
@@ -80,7 +79,9 @@ const Stats = () => {
       month,
       dataIndex: null,
     });
-    myChart.setOption(option);
+    if (option) {
+      myChart.setOption(option);
+    }
     setChart(myChart);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -89,7 +90,6 @@ const Stats = () => {
     if (myChart) {
       const option = getOptions(data, { dimension, year, month });
       if (option) {
-        console.log(option);
         myChart.setOption(option, true);
       }
     }
