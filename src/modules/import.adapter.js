@@ -1,6 +1,6 @@
 import moment from "moment";
 
-const getAmount = (s) => parseFloat(s.replace(/(RMB|¥|\/|,|")/g, ""));
+const getAmount = (s) => parseFloat(s.replace(/(RMB|¥|￥|\/|,|")/g, ""));
 
 const guessCate = (name) => {
   const types = [
@@ -135,7 +135,40 @@ export function icbcAdapter(raw, dataMap) {
 }
 
 // 招商银行
-export function smbAdapter() {}
+export function smbAdapter(raw, dataMap) {
+  const outgo = [];
+  const income = [];
+
+  const current = new Date();
+  const isFirstMonth = current.getMonth() === 1;
+  const currentYear = current.getFullYear();
+
+  raw
+    .trim()
+    .split(/[\n\r]+/)
+    .forEach((t) => {
+      const item = t.split(",");
+      let time = moment(`${currentYear}${item[0]}`);
+      if (isFirstMonth && /^12/.test(item[0])) {
+        time = moment(`${currentYear - 1}${item[0]}`);
+      }
+      const fmt = {
+        category: dataMap[item[2]] || guessCate(item[2]) || "",
+        subCategory: "",
+        target: item[2],
+        amount: `¥${getAmount(item[3])}`,
+        account: "招商银行 信用卡",
+        time: time.valueOf(),
+        remark: "",
+      };
+      fmt.id = outgo.length;
+      outgo.push(fmt);
+    });
+  return {
+    outgo: outgo.sort((a, b) => a.time - b.time),
+    income: income.sort((a, b) => a.time - b.time),
+  };
+}
 
 export function wechatAdapter(raw, dataMap) {
   const outgo = [];
