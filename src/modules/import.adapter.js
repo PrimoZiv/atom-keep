@@ -118,7 +118,7 @@ export function icbcAdapter(raw, dataMap) {
         amount: `¥${getAmount(item[5])}`,
         account: "工商银行 信用卡",
         time: moment(item[1]).valueOf(),
-        remark: "",
+        remark: item[4],
       };
       if (item[6].includes("支出")) {
         fmt.id = outgo.length;
@@ -159,7 +159,35 @@ export function smbAdapter(raw, dataMap) {
         amount: `¥${getAmount(item[3])}`,
         account: "招商银行 信用卡",
         time: time.valueOf(),
-        remark: "",
+        remark: item[2],
+      };
+      fmt.id = outgo.length;
+      outgo.push(fmt);
+    });
+  return {
+    outgo: outgo.sort((a, b) => a.time - b.time),
+    income: income.sort((a, b) => a.time - b.time),
+  };
+}
+
+export function bocAdapter(raw, dataMap) {
+  const outgo = [];
+  const income = [];
+
+  raw
+    .trim()
+    .split(/[\n\r]+/)
+    .forEach((t) => {
+      const item = t.split(/\s+\t/);
+      const target = item[3].replace(/\s?\/\s?\/CHN/, '');
+      const fmt = {
+        category: dataMap[target] || guessCate(target) || "",
+        subCategory: "",
+        target,
+        amount: `¥${getAmount(item[4])}`,
+        account: "中国银行 信用卡",
+        time: moment(item[0]).valueOf(),
+        remark: target,
       };
       fmt.id = outgo.length;
       outgo.push(fmt);

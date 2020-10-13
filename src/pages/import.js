@@ -13,6 +13,7 @@ import {
 import {
   icbcAdapter,
   smbAdapter,
+  bocAdapter,
   wechatAdapter,
   alipayAdapter,
   commonAdapter,
@@ -38,6 +39,14 @@ const types = {
     format: {
       fields: ["时间", "", "商户", "金额", "", "", "", "", "", "", ""],
       separator: "[,]",
+    },
+  },
+  boc: {
+    name: "中国银行",
+    handle: bocAdapter,
+    format: {
+      fields: ["时间", "" , "", "商户", "金额", "", "", "", "", "", ""],
+      separator: "[space tab]",
     },
   },
   wechat: {
