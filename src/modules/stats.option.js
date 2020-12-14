@@ -41,12 +41,12 @@ export function getOptions(data, params) {
   let target = {};
   let labels = [];
   switch (dimension) {
-    case "year":
+    case "all":
       const { tar, lab } = getCatesFromData(data);
       target = tar;
       labels = lab;
       break;
-    case "month":
+    case "year":
       if (year) {
         const y = data.find((x) => x.label === year) || {};
         const { tar, lab } = getCatesFromData(y.children || []);
@@ -54,7 +54,7 @@ export function getOptions(data, params) {
         labels = lab;
       }
       break;
-    case "day":
+    case "month":
       if (year && month) {
         const y = data.find((x) => x.label === year) || {};
         const m = (y.children || []).find((x) => x.label === month) || {};

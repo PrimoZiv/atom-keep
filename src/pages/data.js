@@ -102,8 +102,7 @@ const Data = ({ refresh }) => {
         title: "金额",
         dataIndex: "amount",
         sorter: {
-          compare: (a, b) =>
-            +a.amount.replace("¥", "") - +b.amount.replace("¥", ""),
+          compare: (a, b) => a.amount - b.amount,
         },
       },
       { title: "备注", dataIndex: "remark" },
@@ -136,7 +135,7 @@ const Data = ({ refresh }) => {
       const d = {
         ...values,
         time: values.time.valueOf(),
-        amount: `¥${values.amount}`,
+        amount: values.amount,
       };
       delete d.type;
       if (values.type === "income") {

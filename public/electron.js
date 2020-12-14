@@ -14,6 +14,7 @@ function createWindow() {
   const win = new BrowserWindow({
     width: 1600,
     height: 800,
+    fullscreen: true,
     webPreferences: {
       nodeIntegration: false,
       preload: path.join(__dirname, "./renderer.js"),

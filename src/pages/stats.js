@@ -6,6 +6,7 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
+import moment from 'moment';
 import echarts from "echarts";
 import { Divider, Radio } from "antd";
 
@@ -19,12 +20,13 @@ const chartHeight = window.innerHeight - 180;
 
 const Stats = () => {
   const { store } = useContext(StoreContext);
-  const { data } = store;
+  const { data, rawData } = store;
   const ref = useRef(null);
   const [myChart, setChart] = useState(null);
-  const [dimension, setDimension] = useState("year");
+  const [dimension, setDimension] = useState("all");
   const [year, setYear] = useState("");
   const [month, setMonth] = useState("");
+  console.log(rawData);
 
   const yearOptions = useMemo(() => {
     return data.map((y) => ({
@@ -44,9 +46,9 @@ const Stats = () => {
   }, []);
   const handleDimension = (e) => {
     const dim = e.target.value;
-    if (dim === "month" && !year) {
+    if (dim === "year" && !year) {
       setYear(data.length > 0 ? data[data.length - 1].label : "");
-    } else if (dim === "day") {
+    } else if (dim === "month") {
       if (!year) {
         setYear(data.length > 0 ? data[data.length - 1].label : "");
       }
@@ -70,6 +72,43 @@ const Stats = () => {
     },
     [data, dimension, month, myChart, year]
   );
+  const handlePieSelect = useCallback(
+    (event) => {
+      console.log(event);
+      switch (dimension) {
+        case "all":
+          break;
+        case "year":
+          const yearData = rawData.find((r) => r.label === +year);
+          if (yearData) {
+            const yearAll = [...yearData.outgo];
+            const yearTop = yearAll
+              .filter((x) => x.category === event.name)
+              .slice(0, 10)
+              .sort((a, b) => b.amount - a.amount);
+            console.log(yearTop);
+          }
+          break;
+        case "month":
+          const monthStr = `${year}-${month}-01 00:00:00`;
+          const monthStart = moment(monthStr).startOf('month').valueOf();
+          const monthEnd = moment(monthStr).endOf('month').valueOf();
+          const yData = rawData.find((r) => r.label === +year);
+          if (yData) {
+            const yAll = [...yData.outgo];
+            const monthData = yAll.filter(x => x.time >= monthStart && x.time <= monthEnd);
+            const monthTop = monthData
+              .filter((x) => x.category === event.name)
+              .slice(0, 10)
+              .sort((a, b) => b.amount - a.amount);
+            console.log(monthTop);
+          }
+          break;
+        default:
+      }
+    },
+    [rawData, dimension, year, month]
+  );
 
   useEffect(() => {
     const myChart = echarts.init(ref.current);
@@ -83,8 +122,19 @@ const Stats = () => {
       myChart.setOption(option);
     }
     setChart(myChart);
+    return () => {
+      myChart.dispose();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!myChart) {
+      return;
+    }
+    myChart.off("click", handlePieSelect);
+    myChart.on("click", handlePieSelect);
+  }, [myChart, handlePieSelect]);
 
   useEffect(() => {
     if (myChart) {
@@ -109,9 +159,9 @@ const Stats = () => {
           维度选择：
           <Radio.Group onChange={handleDimension} value={dimension}>
             {[
+              { label: "所有", value: "all" },
               { label: "年", value: "year" },
               { label: "月", value: "month" },
-              { label: "日", value: "day" },
             ].map((o) => (
               <Radio key={o.value} value={o.value}>
                 {o.label}
@@ -119,7 +169,7 @@ const Stats = () => {
             ))}
           </Radio.Group>
         </div>
-        {dimension !== "year" ? (
+        {dimension !== "all" ? (
           <div>
             年份选择：
             <Radio.Group
@@ -134,7 +184,7 @@ const Stats = () => {
             </Radio.Group>
           </div>
         ) : null}
-        {dimension === "day" ? (
+        {dimension === "month" ? (
           <div>
             月：
             <Radio.Group
