@@ -122,7 +122,7 @@ export function getOptions(data, params) {
       type: "value",
     },
     grid: {
-      top: "300",
+      top: "400",
       left: "240",
       right: "100",
     },
@@ -156,7 +156,7 @@ export function getOptions(data, params) {
       {
         type: "pie",
         radius: "100",
-        center: ["50%", "170"],
+        center: ["30%", "170"],
         label: {
           formatter: "{b}: {c} ({d}%)",
           fontSize: 16,

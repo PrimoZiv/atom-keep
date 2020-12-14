@@ -6,9 +6,9 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
-import moment from 'moment';
+import moment from "moment";
 import echarts from "echarts";
-import { Divider, Radio } from "antd";
+import { Divider, Radio, Table } from "antd";
 
 import StoreContext from "../modules/context";
 import { getOptions } from "../modules/stats.option";
@@ -18,6 +18,31 @@ import style from "./stats.module.css";
 const chartWidth = window.innerWidth - 70;
 const chartHeight = window.innerHeight - 180;
 
+const topColumns = [
+  {
+    title: "类别",
+    dataIndex: "category",
+  },
+  {
+    title: "金额",
+    dataIndex: "amount",
+    render: v => `￥${v}`
+  },
+  {
+    title: "账户",
+    dataIndex: "account",
+  },
+  {
+    title: "时间",
+    dataIndex: "time",
+    render: (v) => moment(v).format("YYYY-MM-DD HH:mm"),
+  },
+  {
+    title: "备注",
+    dataIndex: "remark",
+  },
+];
+
 const Stats = () => {
   const { store } = useContext(StoreContext);
   const { data, rawData } = store;
@@ -26,6 +51,9 @@ const Stats = () => {
   const [dimension, setDimension] = useState("all");
   const [year, setYear] = useState("");
   const [month, setMonth] = useState("");
+
+  const [topTitle, setTopTitle] = useState("");
+  const [dataSource, setDataSource] = useState([]);
   console.log(rawData);
 
   const yearOptions = useMemo(() => {
@@ -74,9 +102,18 @@ const Stats = () => {
   );
   const handlePieSelect = useCallback(
     (event) => {
-      console.log(event);
+      setTopTitle(event.name);
       switch (dimension) {
         case "all":
+          const allData = [];
+          rawData.forEach(r => {
+            allData.push(...r.outgo);
+          })
+          const allTop = allData
+            .filter((x) => x.category === event.name)
+            .sort((a, b) => b.amount - a.amount)
+            .slice(0, 10);
+          setDataSource(allTop);
           break;
         case "year":
           const yearData = rawData.find((r) => r.label === +year);
@@ -84,24 +121,26 @@ const Stats = () => {
             const yearAll = [...yearData.outgo];
             const yearTop = yearAll
               .filter((x) => x.category === event.name)
-              .slice(0, 10)
-              .sort((a, b) => b.amount - a.amount);
-            console.log(yearTop);
+              .sort((a, b) => b.amount - a.amount)
+              .slice(0, 10);
+            setDataSource(yearTop);
           }
           break;
         case "month":
           const monthStr = `${year}-${month}-01 00:00:00`;
-          const monthStart = moment(monthStr).startOf('month').valueOf();
-          const monthEnd = moment(monthStr).endOf('month').valueOf();
+          const monthStart = moment(monthStr).startOf("month").valueOf();
+          const monthEnd = moment(monthStr).endOf("month").valueOf();
           const yData = rawData.find((r) => r.label === +year);
           if (yData) {
             const yAll = [...yData.outgo];
-            const monthData = yAll.filter(x => x.time >= monthStart && x.time <= monthEnd);
+            const monthData = yAll.filter(
+              (x) => x.time >= monthStart && x.time <= monthEnd
+            );
             const monthTop = monthData
               .filter((x) => x.category === event.name)
-              .slice(0, 10)
-              .sort((a, b) => b.amount - a.amount);
-            console.log(monthTop);
+              .sort((a, b) => b.amount - a.amount)
+              .slice(0, 10);
+            setDataSource(monthTop);
           }
           break;
         default:
@@ -201,7 +240,18 @@ const Stats = () => {
         ) : null}
       </div>
       <Divider />
-      <div ref={ref} style={{ width: chartWidth, height: chartHeight }} />
+      <div className={style.canvasWrapper}>
+        <div className={style.topItems}>
+          <Table
+            size="small"
+            rowKey="id"
+            pagination={false}
+            columns={topColumns}
+            dataSource={dataSource}
+          />
+        </div>
+        <div ref={ref} style={{ width: chartWidth, height: chartHeight }} />
+      </div>
     </div>
   );
 };

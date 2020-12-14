@@ -1,3 +1,13 @@
 .filter {
   padding: 20px 100px 20px;
 }
+.canvasWrapper {
+  position: relative;
+}
+.topItems {
+  position: absolute;
+  left: 60%;
+  top: 0;
+  width: 700px;
+  zoom: 0.9;
+}
