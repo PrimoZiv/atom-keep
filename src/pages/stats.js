@@ -52,7 +52,6 @@ const Stats = () => {
   const [year, setYear] = useState("");
   const [month, setMonth] = useState("");
 
-  const [topTitle, setTopTitle] = useState("");
   const [dataSource, setDataSource] = useState([]);
   console.log(rawData);
 
@@ -102,7 +101,6 @@ const Stats = () => {
   );
   const handlePieSelect = useCallback(
     (event) => {
-      setTopTitle(event.name);
       switch (dimension) {
         case "all":
           const allData = [];
