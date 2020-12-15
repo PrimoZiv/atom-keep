@@ -1,5 +1,5 @@
 export function getOptions(data, params) {
-  const { dimension, year, month } = params;
+  const { dimension, year, month, incomeVisible } = params;
   let target = data;
   switch (dimension) {
     case "year":
@@ -28,6 +28,27 @@ export function getOptions(data, params) {
       break;
     default:
   }
+
+  const series = [
+    {
+      data: target.map((d) => d.outgo),
+      type: "line",
+      lineStyle: {
+        color: "#e25858",
+      },
+    },
+  ];
+
+  if (incomeVisible) {
+    series.push({
+      data: target.map((d) => d.income),
+      type: "line",
+      lineStyle: {
+        color: "#48af48",
+      },
+    });
+  }
+
   return {
     xAxis: {
       type: "category",
@@ -42,27 +63,12 @@ export function getOptions(data, params) {
     tooltip: {
       trigger: "axis",
       formatter: function (params) {
-        return `<h3 style="color:white;">${params[0].name}</h3><div>out: ${params[0].value}</div><div>in: ${params[1].value}</div>`;
+        return `<h3 style="color:white;">${params[0].name}</h3><div>out: ${params[0].value}</div><div>in: ${params[1] ? params[1].value : '***'}</div>`;
       },
       axisPointer: {
         animation: false,
       },
     },
-    series: [
-      {
-        data: target.map((d) => d.outgo),
-        type: "line",
-        lineStyle: {
-          color: "#e25858",
-        },
-      },
-      {
-        data: target.map((d) => d.income),
-        type: "line",
-        lineStyle: {
-          color: "#48af48",
-        },
-      },
-    ],
+    series,
   };
 }

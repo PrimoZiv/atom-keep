@@ -1,3 +1,11 @@
 .filter {
-  padding: 20px 100px 20px
+  padding: 20px 100px 20px;
+}
+.visibleCtrl {
+  padding-right: 100px;
+  display: flex;
+  justify-content: flex-end;
+}
+.visibleCtrl > span {
+  cursor: pointer;
 }

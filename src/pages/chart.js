@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState, useMemo, useContext } from "react";
 import echarts from "echarts";
 import { Radio, Divider } from "antd";
+import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
 import StoreContext from "../modules/context";
 import { getOptions } from "../modules/chart.option";
 
@@ -11,6 +12,7 @@ export default function Chart() {
   const { data = [] } = store;
   const ref = useRef(null);
   const [myChart, setChart] = useState(null);
+  const [incomeVisible, setIncomeVisible] = useState(false);
   const [dimension, setDimension] = useState("year");
   const [year, setYear] = useState(
     data.length > 0 ? data[data.length - 1].label : ""
@@ -33,10 +35,10 @@ export default function Chart() {
 
   useEffect(() => {
     if (myChart) {
-      var option = getOptions(data, { dimension, year });
-      myChart.setOption(option);
+      var option = getOptions(data, { dimension, year, incomeVisible });
+      myChart.setOption(option, true);
     }
-  }, [myChart, dimension, year, data]);
+  }, [myChart, dimension, year, data, incomeVisible]);
 
   return (
     <div>
@@ -79,7 +81,14 @@ export default function Chart() {
         ) : null}
       </div>
       <Divider />
-      <div style={{ width: "100%", height: "600px" }} ref={ref} />
+      <div>
+        <div className={style.visibleCtrl}>
+          <span onClick={() => setIncomeVisible(!incomeVisible)}>
+            {incomeVisible ? <EyeOutlined /> : <EyeInvisibleOutlined />} 收入
+          </span>
+        </div>
+        <div style={{ width: "100%", height: "600px" }} ref={ref} />
+      </div>
     </div>
   );
 }

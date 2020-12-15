@@ -14,6 +14,7 @@ import {
   Popconfirm,
   Space,
 } from "antd";
+import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
 import moment from "moment";
 import { outgoTypes, incomeTypes } from "../contants";
 import getRawData from "../modules/data.get";
@@ -33,6 +34,7 @@ const Data = ({ refresh }) => {
   const [outData, setOutData] = useState([]);
   const [inData, setInData] = useState([]);
   const [addVisible, setModal] = useState(false);
+  const [incomeVisible, setIncomeVisible] = useState(false);
   const [options, setOptions] = useState(incomeTypes);
   const [form] = Form.useForm();
   let yearOptions = [];
@@ -72,6 +74,10 @@ const Data = ({ refresh }) => {
       refresh();
     });
   };
+  const handleInvisibleChange = (e, flag) => {
+    e.stopPropagation();
+    setIncomeVisible(flag);
+  };
 
   const getColumns = (type) => {
     const cateTypes = type === "outgo" ? outgoTypes : incomeTypes;
@@ -99,8 +105,19 @@ const Data = ({ refresh }) => {
       { title: "子类别", dataIndex: "subCategory" },
       { title: "账户", dataIndex: "account" },
       {
-        title: "金额",
+        title: () => (
+          <span>
+            金额{" "}
+            {incomeVisible ? (
+              <EyeOutlined onClick={(e) => handleInvisibleChange(e, false)} />
+            ) : (
+              <EyeInvisibleOutlined onClick={(e) => handleInvisibleChange(e, true)} />
+            )}
+          </span>
+        ),
         dataIndex: "amount",
+        render: (v) => (type === "income" && !incomeVisible ? "***" : `￥${v}`),
+        showSorterTooltip: false,
         sorter: {
           compare: (a, b) => a.amount - b.amount,
         },
