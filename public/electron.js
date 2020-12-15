@@ -7,6 +7,7 @@ const initStore = require("../lib/init-store");
 const importData = require("../lib/import-data");
 const getRawData = require("../lib/get-raw-data");
 const removeData = require("../lib/remove-data");
+const editData = require('../lib/edit-data');
 
 const store = new Store();
 
@@ -75,6 +76,17 @@ function createWindow() {
       removeData(dataDir, arg);
     } catch (e) {
       console.log(e);
+    }
+    return Promise.resolve();
+  });
+
+  ipcMain.handle("edit-data", (e, arg) => {
+    const dataDir = store.get("dataDir");
+    try {
+      editData(dataDir, arg);
+    } catch (e) {
+      console.log(e);
+      Promise.reject();
     }
     return Promise.resolve();
   });

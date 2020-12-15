@@ -35,6 +35,7 @@ function App() {
         outgoMap,
         accounts,
       };
+      console.log('store map', outgoMap);
       if (!dataDir) {
         dispatchData.page = "settings";
       }

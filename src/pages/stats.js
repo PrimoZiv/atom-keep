@@ -53,7 +53,6 @@ const Stats = () => {
   const [month, setMonth] = useState("");
 
   const [dataSource, setDataSource] = useState([]);
-  console.log(rawData);
 
   const yearOptions = useMemo(() => {
     return data.map((y) => ({

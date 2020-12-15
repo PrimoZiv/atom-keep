@@ -78,6 +78,23 @@ const Data = ({ refresh }) => {
     e.stopPropagation();
     setIncomeVisible(flag);
   };
+  const handleCellChange = ({ field, value, record, type }) => {
+    const values = { ...record, [field]: value };
+    ipcRenderer.invoke("edit-data", { type, year, values }).then(() => {
+      message.success("修改成功");
+      refresh();
+    });
+  };
+  const handleKeyUp = (e, type, record) => {
+    if (e.key === "Enter" || e.keyCode === 13) {
+      handleCellChange({
+        field: "remark",
+        value: e.target.value,
+        record,
+        type,
+      });
+    }
+  };
 
   const getColumns = (type) => {
     const cateTypes = type === "outgo" ? outgoTypes : incomeTypes;
@@ -90,9 +107,19 @@ const Data = ({ refresh }) => {
       {
         title: "类别",
         dataIndex: "category",
-        render: (v) => {
+        render: (v, record) => {
           return (
-            <Select value={v}>
+            <Select
+              value={v}
+              onChange={(value) =>
+                handleCellChange({
+                  field: "category",
+                  value,
+                  record,
+                  type,
+                })
+              }
+            >
               {cateTypes.map((c) => (
                 <Select.Option key={c} value={c}>
                   {c}
@@ -111,7 +138,9 @@ const Data = ({ refresh }) => {
             {incomeVisible ? (
               <EyeOutlined onClick={(e) => handleInvisibleChange(e, false)} />
             ) : (
-              <EyeInvisibleOutlined onClick={(e) => handleInvisibleChange(e, true)} />
+              <EyeInvisibleOutlined
+                onClick={(e) => handleInvisibleChange(e, true)}
+              />
             )}
           </span>
         ),
@@ -122,7 +151,18 @@ const Data = ({ refresh }) => {
           compare: (a, b) => a.amount - b.amount,
         },
       },
-      { title: "备注", dataIndex: "remark" },
+      {
+        title: "备注",
+        dataIndex: "remark",
+        render: (v, record) => {
+          return (
+            <Input
+              defaultValue={v}
+              onKeyUp={(e) => handleKeyUp(e, type, record)}
+            />
+          );
+        },
+      },
       {
         title: "操作",
         dataIndex: "id",
@@ -210,8 +250,18 @@ const Data = ({ refresh }) => {
         </div>
       </div>
       <Divider />
-      <Table rowKey="id" columns={getColumns("income")} dataSource={inData} />
-      <Table rowKey="id" columns={getColumns("outgo")} dataSource={outData} />
+      <Table
+        rowKey="id"
+        size="small"
+        columns={getColumns("income")}
+        dataSource={inData}
+      />
+      <Table
+        rowKey="id"
+        size="small"
+        columns={getColumns("outgo")}
+        dataSource={outData}
+      />
       <Modal
         visible={addVisible}
         onCancel={() => setModal(false)}
