@@ -31,6 +31,12 @@ export default ({ refresh }) => {
         <p>当前路径：{dataDir}</p>
         <p className={style.hint}>拖拽目录到此区域</p>
       </div>
+      <div
+        className={`${style.action} ${style.hint}`}
+        onDragOver={handleDragOver}
+      >
+        拖放「消费-类型」Map文件到这里添加预置数据
+      </div>
     </div>
   );
 };

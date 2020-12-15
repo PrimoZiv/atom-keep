@@ -2,13 +2,15 @@
   position: relative;
   height: 100%;
   overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  padding: 60px;
+  display: grid;
+  gap: 40px;
+  grid-template-columns: 1fr 1fr;
 }
 .action {
-  width: 70%;
-  height: 60%;
+  width: 100%;
+  height: 100%;
+  word-break: break-all;
   display: flex;
   flex-direction: column;
   justify-content: center;
