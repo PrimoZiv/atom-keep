@@ -24,7 +24,7 @@ let dataCache = [];
 let paramsCache = {};
 
 export function getOptions(data, params) {
-  const { dimension, year, month, dataIndex } = params;
+  const { chartHeight, dimension, year, month, dataIndex } = params;
 
   if (
     data === dataCache &&
@@ -122,7 +122,7 @@ export function getOptions(data, params) {
       type: "value",
     },
     grid: {
-      top: "400",
+      top: chartHeight / 2,
       left: "240",
       right: "100",
     },
@@ -155,12 +155,12 @@ export function getOptions(data, params) {
       }),
       {
         type: "pie",
-        radius: "100",
-        center: ["30%", "170"],
+        radius: chartHeight / 8,
+        center: ["30%", chartHeight / 4],
         label: {
           formatter: "{b}: {c} ({d}%)",
           fontSize: 16,
-          fontWeight: 600
+          fontWeight: 600,
         },
         data: pieData,
       },

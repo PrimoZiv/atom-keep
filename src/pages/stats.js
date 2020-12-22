@@ -21,19 +21,23 @@ const chartHeight = window.innerHeight - 180;
 const topColumns = [
   {
     title: "类别",
+    width: 60,
     dataIndex: "category",
   },
   {
     title: "金额",
+    width: 100,
     dataIndex: "amount",
-    render: v => `￥${v}`
+    render: (v) => `￥${v}`,
   },
   {
     title: "账户",
+    width: 150,
     dataIndex: "account",
   },
   {
     title: "时间",
+    width: 150,
     dataIndex: "time",
     render: (v) => moment(v).format("YYYY-MM-DD HH:mm"),
   },
@@ -87,6 +91,7 @@ const Stats = () => {
   const handleChart = useCallback(
     (e) => {
       const option = getOptions(data, {
+        chartHeight,
         dimension,
         year,
         month,
@@ -103,13 +108,13 @@ const Stats = () => {
       switch (dimension) {
         case "all":
           const allData = [];
-          rawData.forEach(r => {
+          rawData.forEach((r) => {
             allData.push(...r.outgo);
-          })
+          });
           const allTop = allData
             .filter((x) => x.category === event.name)
             .sort((a, b) => b.amount - a.amount)
-            .slice(0, 10);
+            .slice(0, 30);
           setDataSource(allTop);
           break;
         case "year":
@@ -119,7 +124,7 @@ const Stats = () => {
             const yearTop = yearAll
               .filter((x) => x.category === event.name)
               .sort((a, b) => b.amount - a.amount)
-              .slice(0, 10);
+              .slice(0, 20);
             setDataSource(yearTop);
           }
           break;
@@ -136,7 +141,7 @@ const Stats = () => {
             const monthTop = monthData
               .filter((x) => x.category === event.name)
               .sort((a, b) => b.amount - a.amount)
-              .slice(0, 10);
+              .slice(0, 20);
             setDataSource(monthTop);
           }
           break;
@@ -149,6 +154,7 @@ const Stats = () => {
   useEffect(() => {
     const myChart = echarts.init(ref.current);
     const option = getOptions(data, {
+      chartHeight,
       dimension,
       year,
       month,
@@ -174,7 +180,7 @@ const Stats = () => {
 
   useEffect(() => {
     if (myChart) {
-      const option = getOptions(data, { dimension, year, month });
+      const option = getOptions(data, { chartHeight, dimension, year, month });
       if (option) {
         myChart.setOption(option, true);
       }
@@ -240,6 +246,10 @@ const Stats = () => {
       <div className={style.canvasWrapper}>
         <div className={style.topItems}>
           <Table
+            scroll={{
+              scrollToFirstRowOnChange: true,
+              y: `${chartHeight / 2.2}px`,
+            }}
             size="small"
             rowKey="id"
             pagination={false}

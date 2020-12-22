@@ -56,17 +56,23 @@ const Data = ({ refresh }) => {
   }, [rawData, year, month]);
 
   useEffect(() => {
+    if (year && month) {
+      // 已经选择就不重新设置，避免修改后翻页
+      return;
+    }
+
     const lastYear = rawData[rawData.length - 1];
     if (!lastYear) {
       return;
     }
+
     const day = lastYear.outgo[lastYear.outgo.length - 1].time;
     if (day) {
       const date = new Date(day);
       setYear(date.getFullYear());
       setMonth(date.getMonth() + 1);
     }
-  }, [rawData]);
+  }, [rawData, year, month]);
 
   const handleDelete = (year, type, id) => {
     ipcRenderer.invoke("remove-data", { year, type, id }).then(() => {
@@ -132,18 +138,21 @@ const Data = ({ refresh }) => {
       { title: "子类别", dataIndex: "subCategory" },
       { title: "账户", dataIndex: "account" },
       {
-        title: () => (
-          <span>
-            金额{" "}
-            {incomeVisible ? (
-              <EyeOutlined onClick={(e) => handleInvisibleChange(e, false)} />
-            ) : (
-              <EyeInvisibleOutlined
-                onClick={(e) => handleInvisibleChange(e, true)}
-              />
-            )}
-          </span>
-        ),
+        title: () =>
+          type === "income" ? (
+            <span>
+              金额{" "}
+              {incomeVisible ? (
+                <EyeOutlined onClick={(e) => handleInvisibleChange(e, false)} />
+              ) : (
+                <EyeInvisibleOutlined
+                  onClick={(e) => handleInvisibleChange(e, true)}
+                />
+              )}
+            </span>
+          ) : (
+            "金额"
+          ),
         dataIndex: "amount",
         render: (v) => (type === "income" && !incomeVisible ? "***" : `￥${v}`),
         showSorterTooltip: false,
