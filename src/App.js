@@ -35,7 +35,6 @@ function App() {
         outgoMap,
         accounts,
       };
-      console.log('store map', outgoMap);
       if (!dataDir) {
         dispatchData.page = "settings";
       }
@@ -94,8 +93,8 @@ function App() {
       <Layout className="app">
         <Sider className="sider" width={70}>
           <Menu selectedKeys={[page]} onClick={handleMenu}>
-            <Menu.Item key="chart">趋势</Menu.Item>
             <Menu.Item key="stats">统计</Menu.Item>
+            <Menu.Item key="chart">趋势</Menu.Item>
             <Menu.Item key="data">数据</Menu.Item>
             <Menu.Item key="import">导入</Menu.Item>
             <Menu.Item key="settings">设置</Menu.Item>

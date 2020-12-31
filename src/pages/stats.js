@@ -15,9 +15,6 @@ import { getOptions } from "../modules/stats.option";
 
 import style from "./stats.module.css";
 
-const chartWidth = window.innerWidth - 70;
-const chartHeight = window.innerHeight - 180;
-
 const topColumns = [
   {
     title: "类别",
@@ -57,6 +54,8 @@ const Stats = () => {
   const [month, setMonth] = useState("");
 
   const [dataSource, setDataSource] = useState([]);
+  const [chartWidth, setChartWidth] = useState(window.innerWidth - 70);
+  const [chartHeight, setChartHeight] = useState(window.innerHeight - 180);
 
   const yearOptions = useMemo(() => {
     return data.map((y) => ({
@@ -91,7 +90,6 @@ const Stats = () => {
   const handleChart = useCallback(
     (e) => {
       const option = getOptions(data, {
-        chartHeight,
         dimension,
         year,
         month,
@@ -154,7 +152,6 @@ const Stats = () => {
   useEffect(() => {
     const myChart = echarts.init(ref.current);
     const option = getOptions(data, {
-      chartHeight,
       dimension,
       year,
       month,
@@ -180,7 +177,7 @@ const Stats = () => {
 
   useEffect(() => {
     if (myChart) {
-      const option = getOptions(data, { chartHeight, dimension, year, month });
+      const option = getOptions(data, { dimension, year, month });
       if (option) {
         myChart.setOption(option, true);
       }
@@ -193,6 +190,28 @@ const Stats = () => {
       myChart.on("updateAxisPointer", handleChart);
     }
   }, [myChart, handleChart]);
+
+  useEffect(() => {
+    let timer;
+    const handleResize = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        setChartWidth(window.innerWidth - 70);
+        setChartHeight(window.innerHeight - 180);
+      }, 500);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (myChart && chartWidth && chartHeight) {
+      myChart.resize({
+        width: chartWidth,
+        height: chartHeight,
+      });
+    }
+  }, [myChart, chartWidth, chartHeight]);
 
   return (
     <div>
