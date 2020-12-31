@@ -2,7 +2,7 @@
   "name": "atom-keep",
   "description": "atom keep app",
   "author": "Primo",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "private": true,
   "main": "public/electron.js",
   "homepage": ".",
