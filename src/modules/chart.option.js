@@ -36,9 +36,6 @@ export function getOptions(data, params) {
       name: "支出",
       data: target.map((d) => d.outgo),
       type: "line",
-      lineStyle: {
-        color: "#e25858",
-      },
     },
   ];
 
@@ -46,9 +43,6 @@ export function getOptions(data, params) {
     name: "收入",
     data: target.map((d) => d.income),
     type: "line",
-    lineStyle: {
-      color: "#48af48",
-    },
   });
 
   if (dimension === "year") {
@@ -65,15 +59,14 @@ export function getOptions(data, params) {
       name: "结余",
       data,
       type: "line",
-      lineStyle: {
-        color: "#1890ff",
-      },
     });
   }
 
   return {
+    color: ["#e25858", "#48af48", "#1890ff"],
     legend: {
       show: true,
+      icon: 'pin',
       selected: {
         支出: true,
         收入: false,

@@ -8,7 +8,7 @@ import { getOptions } from "../modules/chart.option";
 import style from "./chart.module.css";
 
 const fixPay = localStorage.getItem("perMonthFixPay") || 0;
-const startTime = localStorage.getItem("perMonthFixPayStartTime") || "";
+const startTime = localStorage.getItem("perMonthFixPayStartTime") || moment();
 
 export default function Chart() {
   const { store } = useContext(StoreContext);
