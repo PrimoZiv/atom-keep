@@ -40,11 +40,13 @@ export function getOptions(data, params) {
 
   let target = {};
   let labels = [];
+  let xAxisUnit = '';
   switch (dimension) {
     case "all":
       const { tar, lab } = getCatesFromData(data);
       target = tar;
       labels = lab;
+      xAxisUnit = '年';
       break;
     case "year":
       if (year) {
@@ -52,6 +54,7 @@ export function getOptions(data, params) {
         const { tar, lab } = getCatesFromData(y.children || []);
         target = tar;
         labels = lab;
+        xAxisUnit = '月';
       }
       break;
     case "month":
@@ -61,6 +64,7 @@ export function getOptions(data, params) {
         const { tar, lab } = getCatesFromData(m.children || []);
         target = tar;
         labels = lab;
+        xAxisUnit = '日';
       }
       break;
     default:
@@ -116,6 +120,9 @@ export function getOptions(data, params) {
       axisTick: {
         alignWithLabel: true,
       },
+      axisLabel: {
+        formatter: `{value}${xAxisUnit}`
+      },
       data: labels,
     },
     yAxis: {
@@ -130,14 +137,19 @@ export function getOptions(data, params) {
       trigger: "axis",
       formatter: function (params) {
         let str = "";
+        let total = 0;
         params
           .map((p) => ({
             name: p.dimensionNames[p.seriesIndex + 1],
             value: p.data[p.seriesIndex + 1],
           }))
           .sort((a, b) => b.value - a.value)
-          .forEach((p) => (str += `${p.name}: ${p.value}<br>`));
-        return `<h3 style="color:white;">${params[0].name}</h3>${str}`;
+          .forEach((p) => {
+            str += `${p.name}: ${p.value}<br>`;
+            total += p.value;
+          });
+        total = `￥${toFixed(total)}`;
+        return `<h3 style="color:white;">${params[0].name}${xAxisUnit} ${total}</h3>${str}`;
       },
       axisPointer: {
         animation: false,

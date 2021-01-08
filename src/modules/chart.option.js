@@ -2,9 +2,19 @@ import moment from "moment";
 
 export function getOptions(data, params) {
   const { dimension, year, month, fixPay = 0, startTime } = params;
+  const legendSelected = sessionStorage.getItem("chart_legend_selected");
+  const legendSelectedValue = legendSelected
+    ? JSON.parse(legendSelected)
+    : {
+        支出: true,
+        收入: false,
+        结余: false,
+      };
   let target = data;
+  let xAxisUnit = "";
   switch (dimension) {
     case "all":
+      xAxisUnit = "年";
       break;
     case "year":
       if (year) {
@@ -22,11 +32,13 @@ export function getOptions(data, params) {
         } else {
           target = data.find((y) => y.label === +year).children;
         }
+        xAxisUnit = "月";
       }
       break;
     case "month":
       const yearData = data.find((y) => y.label === +year).children;
       target = yearData.find((y) => y.label === +month).children;
+      xAxisUnit = "日";
       break;
     default:
   }
@@ -50,9 +62,9 @@ export function getOptions(data, params) {
       const currentMoment = moment(`${year}-${d.label}-2`);
       if (startTime) {
         const pay = moment(startTime).isBefore(currentMoment) ? fixPay : 0;
-        return d.income - pay - d.outgo;
+        return (d.income - pay - d.outgo).toFixed(2);
       } else {
-        return d.income - fixPay - d.outgo;
+        return (d.income - fixPay - d.outgo).toFixed(2);
       }
     });
     series.push({
@@ -66,17 +78,16 @@ export function getOptions(data, params) {
     color: ["#e25858", "#48af48", "#1890ff"],
     legend: {
       show: true,
-      icon: 'pin',
-      selected: {
-        支出: true,
-        收入: false,
-        结余: false,
-      },
+      icon: "pin",
+      selected: legendSelectedValue,
     },
     xAxis: {
       type: "category",
       axisTick: {
         alignWithLabel: true,
+      },
+      axisLabel: {
+        formatter: `{value}${xAxisUnit}`,
       },
       data: target.map((d) => d.label),
     },

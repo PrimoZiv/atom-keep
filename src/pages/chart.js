@@ -7,8 +7,8 @@ import { getOptions } from "../modules/chart.option";
 
 import style from "./chart.module.css";
 
-const fixPay = localStorage.getItem("perMonthFixPay") || 0;
-const startTime = localStorage.getItem("perMonthFixPayStartTime") || moment();
+let fixPay = localStorage.getItem("perMonthFixPay") || 0;
+let startTime = localStorage.getItem("perMonthFixPayStartTime") || moment();
 
 export default function Chart() {
   const { store } = useContext(StoreContext);
@@ -33,6 +33,8 @@ export default function Chart() {
   const handleChangeValues = (values) => {
     localStorage.setItem("perMonthFixPay", values.fixPay);
     localStorage.setItem("perMonthFixPayStartTime", values.startTime);
+    fixPay = values.fixPay;
+    startTime = values.startTime;
 
     if (myChart) {
       var option = getOptions(data, {
@@ -53,10 +55,16 @@ export default function Chart() {
 
   useEffect(() => {
     var myChart = echarts.init(ref.current);
-    var option = getOptions(data, { dimension, year, fixPay, startTime });
-    myChart.setOption(option);
+    myChart.on("legendselectchanged", (e) => {
+      sessionStorage.setItem(
+        "chart_legend_selected",
+        JSON.stringify(e.selected)
+      );
+    });
     setChart(myChart);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => {
+      sessionStorage.removeItem("chart_legend_selected");
+    };
   }, []);
 
   useEffect(() => {
