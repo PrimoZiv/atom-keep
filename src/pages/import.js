@@ -37,7 +37,7 @@ const types = {
     name: "招商银行",
     handle: smbAdapter,
     format: {
-      fields: ["时间", "", "商户", "金额", "", "", "", "", "", "", ""],
+      fields: ["时间", "", "商户", "", "", "", "金额", "", "", "", ""],
       separator: "[,]",
     },
   },

@@ -140,7 +140,7 @@ export function smbAdapter(raw, dataMap) {
   const income = [];
 
   const current = new Date();
-  const isFirstMonth = current.getMonth() === 1;
+  const isFirstMonth = current.getMonth() === 0;
   const currentYear = current.getFullYear();
 
   raw
@@ -156,7 +156,7 @@ export function smbAdapter(raw, dataMap) {
         category: dataMap[item[2]] || guessCate(item[2]) || "",
         subCategory: "",
         target: item[2],
-        amount: getAmount(item[3]),
+        amount: getAmount(item[6]),
         account: "招商银行 信用卡",
         time: time.valueOf(),
         remark: item[2],
