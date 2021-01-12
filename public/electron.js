@@ -7,7 +7,8 @@ const initStore = require("../lib/init-store");
 const importData = require("../lib/import-data");
 const getRawData = require("../lib/get-raw-data");
 const removeData = require("../lib/remove-data");
-const editData = require('../lib/edit-data');
+const editData = require("../lib/edit-data");
+const getBillfromEmail = require("../lib/get-bill-from-email");
 
 const store = new Store();
 
@@ -53,6 +54,11 @@ function createWindow() {
       data,
       rawData,
     };
+  });
+
+  ipcMain.handle("check-email", async (e, data) => {
+    const bill = await getBillfromEmail(data);
+    return Promise.resolve(bill);
   });
 
   ipcMain.handle("import-data", async (e, data, cateMap) => {

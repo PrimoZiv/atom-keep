@@ -9,6 +9,7 @@ import {
   Button,
   message,
 } from "antd";
+import { StarFilled } from "@ant-design/icons";
 
 import {
   icbcAdapter,
@@ -23,6 +24,7 @@ import StoreContext from "../modules/context";
 
 import style from "./import.module.css";
 import moment from "moment";
+import ImportEmail from "./import.email";
 
 const types = {
   icbc: {
@@ -45,7 +47,7 @@ const types = {
     name: "中国银行",
     handle: bocAdapter,
     format: {
-      fields: ["时间", "" , "", "商户", "金额", "", "", "", "", "", ""],
+      fields: ["时间", "", "", "商户", "金额", "", "", "", "", "", ""],
       separator: "[space tab]",
     },
   },
@@ -100,6 +102,11 @@ export default ({ refresh }) => {
   const [raw, setRaw] = useState("");
   const [outData, setOutData] = useState([]);
   const [inData, setInData] = useState([]);
+  const [emailVisible, setEmailVisible] = useState(false);
+
+  const handleImportFromEmail = (data) => {
+    setRaw(data.content);
+  };
 
   const handleData = () => {
     let res;
@@ -235,6 +242,10 @@ export default ({ refresh }) => {
 
   return (
     <div className={style.container}>
+      <Button type="primary" icon={<StarFilled />} onClick={() => setEmailVisible(true)}>
+        邮箱账单导入
+      </Button>
+      <Divider />
       <div className={style.step}>
         <Steps size="small" current={step}>
           <Step title="粘贴数据" />
@@ -249,6 +260,7 @@ export default ({ refresh }) => {
               minRows: 10,
               maxRows: 20,
             }}
+            value={raw}
             onChange={(e) => setRaw(e.target.value)}
           />
           <div style={{ marginTop: "20px" }}>
@@ -328,6 +340,11 @@ export default ({ refresh }) => {
           </Button>
         </>
       ) : null}
+      <ImportEmail
+        visible={emailVisible}
+        hideModal={() => setEmailVisible(false)}
+        importData={handleImportFromEmail}
+      />
     </div>
   );
 };
