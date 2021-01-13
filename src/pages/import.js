@@ -32,7 +32,7 @@ const types = {
     handle: icbcAdapter,
     format: {
       fields: ["", "时间", "", "", "商户", "金额", "收支", "", "", "", ""],
-      separator: "[tab]",
+      separator: "[tab|,]",
     },
   },
   smb: {
@@ -110,7 +110,8 @@ export default ({ refresh }) => {
 
   const handleData = () => {
     let res;
-    if (!raw) {
+    if (!raw || !type) {
+      message.error("请补充账单信息");
       return;
     }
     res = types[type].handle(raw, outgoMap);
@@ -242,7 +243,11 @@ export default ({ refresh }) => {
 
   return (
     <div className={style.container}>
-      <Button type="primary" icon={<StarFilled />} onClick={() => setEmailVisible(true)}>
+      <Button
+        type="primary"
+        icon={<StarFilled />}
+        onClick={() => setEmailVisible(true)}
+      >
         邮箱账单导入
       </Button>
       <Divider />

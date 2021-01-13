@@ -11,7 +11,7 @@
 }
 
 .format {
-  height: calc(100% - 60px);
+  height: calc(100% - 160px);
   padding-right: 10px;
   overflow-y: auto;
 }
@@ -22,7 +22,7 @@
 }
 
 .preview {
-  height: calc(100% - 60px);
+  height: calc(100% - 160px);
   display: flex;
   justify-content: space-around;
   align-items: flex-start;

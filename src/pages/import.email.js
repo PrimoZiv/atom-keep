@@ -43,6 +43,12 @@ const ImportEmail = (props) => {
     hideModal();
   };
 
+  const handleKeyUp = (e) => {
+    if (e.keyCode === 13 || e.key === "Enter") {
+      checkEmail();
+    }
+  };
+
   return (
     <Modal
       visible={visible}
@@ -73,6 +79,7 @@ const ImportEmail = (props) => {
               type="password"
               disabled={checking}
               value={password}
+              onKeyUp={handleKeyUp}
               onChange={(e) => setPassword(e.target.value)}
             />
           </Form.Item>

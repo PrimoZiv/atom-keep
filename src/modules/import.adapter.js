@@ -3,6 +3,9 @@ import moment from "moment";
 const getAmount = (s) => parseFloat(s.replace(/(RMB|¥|￥|\/|,|")/g, ""));
 
 const guessCate = (name) => {
+  if (!name) {
+    return "";
+  }
   const types = [
     [
       [
@@ -108,9 +111,10 @@ export function icbcAdapter(raw, dataMap) {
 
   raw
     .trim()
-    .split(/[\n\r]/)
+    .split(/[\n\r]+/)
     .forEach((t) => {
-      const item = t.split(/\t/);
+      const item = t.split(/[\t,]/);
+      console.log(item, item[5]);
       const fmt = {
         category: dataMap[item[4]] || guessCate(item[4]) || "",
         subCategory: "",
@@ -179,7 +183,7 @@ export function bocAdapter(raw, dataMap) {
     .split(/[\n\r]+/)
     .forEach((t) => {
       const item = t.split(/\s+\t/);
-      const target = item[3].replace(/\s?\/\s?\/CHN/, '');
+      const target = item[3].replace(/\s?\/\s?\/CHN/, "");
       const fmt = {
         category: dataMap[target] || guessCate(target) || "",
         subCategory: "",
