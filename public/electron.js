@@ -57,7 +57,7 @@ function createWindow() {
   });
 
   ipcMain.handle("check-email", async (e, data) => {
-    const bill = await getBillfromEmail(data);
+    const bill = await getBillfromEmail(data, win);
     return Promise.resolve(bill);
   });
 

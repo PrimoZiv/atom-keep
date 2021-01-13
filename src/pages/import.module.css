@@ -58,3 +58,8 @@
 .explain li:last-child {
   border: none;
 }
+
+.log {
+  font-size: 12px;
+  margin-top: 20px;
+}

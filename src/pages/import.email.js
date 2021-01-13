@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import moment from "moment";
-import { Button, Form, Input, Modal, Result } from "antd";
+import { Button, Card, Form, Input, Modal, Result } from "antd";
+
+import style from "./import.module.css";
 
 const { ipcRenderer } = window.electron;
+let msgs = [];
 
 const ImportEmail = (props) => {
   const { visible, hideModal, importData } = props;
@@ -12,25 +15,39 @@ const ImportEmail = (props) => {
   );
   const [password, setPassword] = useState("");
   const [data, setData] = useState(null);
+  const [processMsg, setProcessMsg] = useState([]);
 
   const checkEmail = () => {
     if (checking || !email || !password) {
       return;
     }
+
+    msgs = [];
     localStorage.setItem("import_email", email);
     setChecking(true);
-    ipcRenderer.invoke("check-email", { email, password }).then(
-      (data) => {
-        if (data?.content) {
-          setData(data);
+
+    ipcRenderer.on("fetch-email-bill-process", (event, message) => {
+      const newMsgs = [...msgs, message];
+      msgs = newMsgs;
+      setProcessMsg(newMsgs);
+    });
+
+    ipcRenderer
+      .invoke("check-email", { email, password })
+      .then(
+        (data) => {
+          if (data?.content) {
+            setData(data);
+          }
+        },
+        (err) => {
+          console.error(err);
         }
+      )
+      .finally(() => {
         setChecking(false);
-      },
-      (err) => {
-        console.error(err);
-        setChecking(false);
-      }
-    );
+        ipcRenderer.removeAllListeners("fetch-email-bill-process");
+      });
   };
 
   const handleCancel = () => {
@@ -88,6 +105,15 @@ const ImportEmail = (props) => {
           </Button>
         </Form>
       )}
+      {processMsg.length > 0 ? (
+        <Card size="small" title="日志" className={style.log} bordered={false}>
+          <ol>
+            {processMsg.map((m, i) => (
+              <li key={i}>{m}</li>
+            ))}
+          </ol>
+        </Card>
+      ) : null}
     </Modal>
   );
 };
