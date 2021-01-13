@@ -1,6 +1,7 @@
 import moment from "moment";
 
-const getAmount = (s) => parseFloat(s.replace(/(RMB|¥|￥|\/|,|")/g, ""));
+const getAmount = (s) =>
+  s ? parseFloat(s.trim().replace(/(RMB|¥|￥|\/|,|")/g, "")) : 0;
 
 const guessCate = (name) => {
   if (!name) {
@@ -83,7 +84,7 @@ export function commonAdapter(raw, dataMap) {
 
   raw
     .trim()
-    .split(/[\n\r]/)
+    .split(/[\n\r]+/)
     .forEach((t) => {
       const item = t.split(",");
       const fmt = {
@@ -114,7 +115,6 @@ export function icbcAdapter(raw, dataMap) {
     .split(/[\n\r]+/)
     .forEach((t) => {
       const item = t.split(/[\t,]/);
-      console.log(item, item[5]);
       const fmt = {
         category: dataMap[item[4]] || guessCate(item[4]) || "",
         subCategory: "",
@@ -174,6 +174,7 @@ export function smbAdapter(raw, dataMap) {
   };
 }
 
+// 中国银行
 export function bocAdapter(raw, dataMap) {
   const outgo = [];
   const income = [];
@@ -182,19 +183,23 @@ export function bocAdapter(raw, dataMap) {
     .trim()
     .split(/[\n\r]+/)
     .forEach((t) => {
-      const item = t.split(/\s+\t/);
-      const target = item[3].replace(/\s?\/\s?\/CHN/, "");
+      const item = t.split(/ *\t */);
+      const target = item[3].replace(/\s?\/?\s?\/?CHN/, "");
       const fmt = {
         category: dataMap[target] || guessCate(target) || "",
         subCategory: "",
         target,
-        amount: getAmount(item[4]),
+        amount: /\d/.test(item[5]) ? getAmount(item[5]) : getAmount(item[4]),
         account: "中国银行 信用卡",
         time: moment(item[0]).valueOf(),
         remark: target,
       };
       fmt.id = outgo.length;
-      outgo.push(fmt);
+      if (/\d/.test(item[5])) {
+        outgo.push(fmt);
+      } else {
+        income.push(fmt);
+      }
     });
   return {
     outgo: outgo.sort((a, b) => a.time - b.time),
@@ -212,7 +217,7 @@ export function wechatAdapter(raw, dataMap) {
 
   raw
     .trim()
-    .split(/[\n\r]/)
+    .split(/[\n\r]+/)
     .forEach((t) => {
       const item = t.split(",");
       const fmt = {
@@ -245,7 +250,7 @@ export function alipayAdapter(raw, dataMap) {
 
   raw
     .trim()
-    .split(/[\n\r]/)
+    .split(/[\n\r]+/)
     .forEach((t) => {
       const item = t.split(",");
       const time = moment(item[2]).valueOf();
