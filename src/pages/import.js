@@ -105,16 +105,18 @@ export default ({ refresh }) => {
   const [emailVisible, setEmailVisible] = useState(false);
 
   const handleImportFromEmail = (data) => {
-    setRaw(data.content);
+    handleData(data.content, data.type);
   };
 
-  const handleData = () => {
+  const handleData = (rawDef, typeDef) => {
     let res;
-    if (!raw || !type) {
+    const rawValue = rawDef || raw;
+    const typeValue = typeDef || type;
+    if (!rawValue || !typeValue) {
       message.error("请补充账单信息");
       return;
     }
-    res = types[type].handle(raw, outgoMap);
+    res = types[typeValue].handle(rawValue, outgoMap);
     const { outgo, income } = res;
     setOutData(outgo);
     setInData(income);
@@ -270,7 +272,7 @@ export default ({ refresh }) => {
           />
           <div style={{ marginTop: "20px" }}>
             选择类别：
-            <Radio.Group onChange={(e) => setType(e.target.value)}>
+            <Radio.Group value={type} onChange={(e) => setType(e.target.value)}>
               {Object.keys(types).map((t) => (
                 <Radio key={t} value={t}>
                   {types[t].name}
