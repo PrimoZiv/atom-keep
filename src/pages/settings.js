@@ -21,7 +21,7 @@ export default ({ refresh }) => {
     e.stopPropagation();
   };
 
-  const demo = `// [年份].json
+  const dataFileDemo = `// [必须为年份].json
   {
     "outgo": [
       {
@@ -37,8 +37,12 @@ export default ({ refresh }) => {
     "income": [
       // 同上
     ]
-  }
-  `;
+  }`;
+  const dataMapDemo = `
+  {
+    "永辉超市": "购物",
+    ...
+  }`;
 
   return (
     <div className={style.container}>
@@ -50,13 +54,15 @@ export default ({ refresh }) => {
         <p className={style.hint}>拖拽目录到此区域</p>
         <p>当前路径：{dataDir}</p>
         <p>数据示例：</p>
-        <pre>{demo}</pre>
+        <pre>{dataFileDemo}</pre>
       </div>
       <div
         className={`${style.action} ${style.hint}`}
         onDragOver={handleDragOver}
       >
         <p className={style.hint}>拖放「消费-类型」Map文件到这里添加预置数据</p>
+        <p>数据示例：</p>
+        <pre>{dataMapDemo}</pre>
       </div>
     </div>
   );

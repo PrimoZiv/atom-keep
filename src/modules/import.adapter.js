@@ -3,10 +3,15 @@ import moment from "moment";
 const getAmount = (s) =>
   s ? parseFloat(s.trim().replace(/(RMB|¥|￥|\/|,|")/g, "")) : 0;
 
-const guessCate = (name) => {
+const guessCate = (name, dataMap) => {
   if (!name) {
     return "";
   }
+
+  if (dataMap[name]) {
+    return dataMap[name];
+  }
+
   const types = [
     [
       [
@@ -68,6 +73,7 @@ const guessCate = (name) => {
     ],
     [["携程", "飞猪", "去哪", "酒店", "航空"], "旅行"],
   ];
+
   for (let i = 0; i < types.length; i++) {
     const [keywords, cate] = types[i];
     if (keywords.some((k) => name.includes(k))) {
@@ -115,14 +121,15 @@ export function icbcAdapter(raw, dataMap) {
     .split(/[\n\r]+/)
     .forEach((t) => {
       const item = t.split(/[\t,]/);
+      const target = item[4].replace(/\s/g, "");
       const fmt = {
-        category: dataMap[item[4]] || guessCate(item[4]) || "",
+        category: guessCate(target, dataMap),
         subCategory: "",
-        target: item[4],
+        target,
         amount: getAmount(item[5]),
         account: "工商银行 信用卡",
         time: moment(item[1]).valueOf(),
-        remark: item[4],
+        remark: target,
       };
       if (item[6].includes("支出")) {
         fmt.id = outgo.length;
@@ -156,14 +163,15 @@ export function smbAdapter(raw, dataMap) {
       if (isFirstMonth && /^12/.test(item[0])) {
         time = moment(`${currentYear - 1}${item[0]}`);
       }
+      const target = item[2].replace(/\s/g, "");
       const fmt = {
-        category: dataMap[item[2]] || guessCate(item[2]) || "",
+        category: guessCate(target, dataMap),
         subCategory: "",
-        target: item[2],
+        target,
         amount: getAmount(item[6]),
         account: "招商银行 信用卡",
         time: time.valueOf(),
-        remark: item[2],
+        remark: target,
       };
       fmt.id = outgo.length;
       outgo.push(fmt);
@@ -184,9 +192,9 @@ export function bocAdapter(raw, dataMap) {
     .split(/[\n\r]+/)
     .forEach((t) => {
       const item = t.split(/ *\t */);
-      const target = item[3].replace(/\s?\/?\s?\/?CHN/, "");
+      const target = item[3].replace(/(\s|\/|CHN)/g, "");
       const fmt = {
-        category: dataMap[target] || guessCate(target) || "",
+        category: guessCate(target, dataMap),
         subCategory: "",
         target,
         amount: /\d/.test(item[5]) ? getAmount(item[5]) : getAmount(item[4]),
@@ -220,14 +228,15 @@ export function wechatAdapter(raw, dataMap) {
     .split(/[\n\r]+/)
     .forEach((t) => {
       const item = t.split(",");
+      const target = item[2].replace(/\s/g, "");
       const fmt = {
-        category: dataMap[item[2]] || guessCate(item[2]) || "",
+        category: guessCate(target, dataMap),
         subCategory: "",
-        target: item[2],
+        target,
         amount: getAmount(item[5]),
         account: accountMap[item[6]],
         time: moment(item[0]).valueOf(),
-        remark: "",
+        remark: target,
       };
       if (item[4].includes("支出")) {
         fmt.id = outgo.length;
@@ -254,14 +263,15 @@ export function alipayAdapter(raw, dataMap) {
     .forEach((t) => {
       const item = t.split(",");
       const time = moment(item[2]).valueOf();
+      const target = item[7].replace(/\s/g, "");
       const fmt = {
-        category: dataMap[item[7]] || guessCate(item[7]) || "",
+        category: guessCate(target, dataMap),
         subCategory: "",
-        target: item[7],
+        target,
         amount: getAmount(item[9]),
         account: time > t2015 ? "招商银行 信用卡" : "支付宝 余额宝",
         time,
-        remark: "",
+        remark: target,
       };
       if (item[10].includes("支出")) {
         fmt.id = outgo.length;
