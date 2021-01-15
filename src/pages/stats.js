@@ -49,13 +49,13 @@ const Stats = () => {
   const { data, rawData } = store;
   const ref = useRef(null);
   const [myChart, setChart] = useState(null);
-  const [dimension, setDimension] = useState("all");
+  const [dimension, setDimension] = useState("year");
   const [year, setYear] = useState("");
   const [month, setMonth] = useState("");
 
   const [dataSource, setDataSource] = useState([]);
   const [chartWidth, setChartWidth] = useState(window.innerWidth - 70);
-  const [chartHeight, setChartHeight] = useState(window.innerHeight - 180);
+  const [chartHeight, setChartHeight] = useState(window.innerHeight - 200);
 
   const yearOptions = useMemo(() => {
     return data.map((y) => ({
@@ -75,9 +75,9 @@ const Stats = () => {
   }, []);
   const handleDimension = (e) => {
     const dim = e.target.value;
-    if (dim === "year" && !year) {
+    if (dim === "month" && !year) {
       setYear(data.length > 0 ? data[data.length - 1].label : "");
-    } else if (dim === "month") {
+    } else if (dim === "day") {
       if (!year) {
         setYear(data.length > 0 ? data[data.length - 1].label : "");
       }
@@ -104,7 +104,7 @@ const Stats = () => {
   const handlePieSelect = useCallback(
     (event) => {
       switch (dimension) {
-        case "all":
+        case "year":
           const allData = [];
           rawData.forEach((r) => {
             allData.push(...r.outgo);
@@ -115,7 +115,7 @@ const Stats = () => {
             .slice(0, 30);
           setDataSource(allTop);
           break;
-        case "year":
+        case "month":
           const yearData = rawData.find((r) => r.label === +year);
           if (yearData) {
             const yearAll = [...yearData.outgo];
@@ -126,10 +126,10 @@ const Stats = () => {
             setDataSource(yearTop);
           }
           break;
-        case "month":
+        case "day":
           const monthStr = `${year}-${month}-01 00:00:00`;
-          const monthStart = moment(monthStr).startOf("month").valueOf();
-          const monthEnd = moment(monthStr).endOf("month").valueOf();
+          const monthStart = moment(monthStr).startOf("day").valueOf();
+          const monthEnd = moment(monthStr).endOf("day").valueOf();
           const yData = rawData.find((r) => r.label === +year);
           if (yData) {
             const yAll = [...yData.outgo];
@@ -217,51 +217,43 @@ const Stats = () => {
     <div>
       <div className={style.filter}>
         <div>
-          维度选择：
-          <Radio.Group onChange={handleDimension} value={dimension}>
-            {[
-              { label: "所有", value: "all" },
+          报表维度：
+          <Radio.Group
+            options={[
               { label: "年", value: "year" },
               { label: "月", value: "month" },
-            ].map((o) => (
-              <Radio key={o.value} value={o.value}>
-                {o.label}
-              </Radio>
-            ))}
-          </Radio.Group>
+              { label: "日", value: "day" },
+            ]}
+            onChange={handleDimension}
+            value={dimension}
+            optionType="button"
+            buttonStyle="solid"
+          />
         </div>
-        {dimension !== "all" ? (
-          <div>
-            年份选择：
-            <Radio.Group
-              onChange={(e) => setYear(e.target.value)}
-              value={+year}
-            >
-              {yearOptions.map((o) => (
-                <Radio key={o.value} value={o.value}>
-                  {o.label}
-                </Radio>
-              ))}
-            </Radio.Group>
-          </div>
-        ) : null}
-        {dimension === "month" ? (
-          <div>
-            月：
-            <Radio.Group
-              onChange={(e) => setMonth(e.target.value)}
-              value={+month}
-            >
-              {monthOptions.map((o) => (
-                <Radio key={o.value} value={o.value}>
-                  {o.label}
-                </Radio>
-              ))}
-            </Radio.Group>
-          </div>
-        ) : null}
+        <div>
+          年份选择：
+          <Radio.Group
+            options={yearOptions}
+            onChange={(e) => setYear(e.target.value)}
+            value={+year}
+            disabled={dimension === "year"}
+            optionType="button"
+            buttonStyle="solid"
+          />
+        </div>
+        <div>
+          月份选择：
+          <Radio.Group
+            options={monthOptions}
+            onChange={(e) => setMonth(e.target.value)}
+            value={+month}
+            disabled={dimension !== "day"}
+            optionType="button"
+            buttonStyle="solid"
+          />
+        </div>
       </div>
-      <Divider />
+      <Divider style={{ margin: "12px 0" }} />
       <div className={style.canvasWrapper}>
         <div className={style.topItems}>
           <Table

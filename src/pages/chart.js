@@ -15,19 +15,25 @@ export default function Chart() {
   const { data = [] } = store;
   const ref = useRef(null);
   const [myChart, setChart] = useState(null);
-  const [dimension, setDimension] = useState("all");
+  const [dimension, setDimension] = useState("year");
   const [year, setYear] = useState(
     data.length > 0 ? data[data.length - 1].label : ""
   );
   const [form] = Form.useForm();
   const [chartWidth, setChartWidth] = useState(window.innerWidth - 100);
-  const [chartHeight, setChartHeight] = useState(window.innerHeight - 240);
+  const [chartHeight, setChartHeight] = useState(window.innerHeight - 200);
 
   const yearOptions = useMemo(() => {
-    return data.map((y) => ({
-      label: `${y.label}年`,
-      value: y.label,
-    }));
+    const allYears = {
+      label: "所有",
+      value: -1,
+    };
+    return [allYears].concat(
+      data.map((y) => ({
+        label: `${y.label}年`,
+        value: y.label,
+      }))
+    );
   }, [data]);
 
   const handleChangeValues = (values) => {
@@ -47,7 +53,7 @@ export default function Chart() {
   };
 
   const handleDimension = (e) => {
-    if (e.target.value === "year") {
+    if (e.target.value === "month") {
       setYear(data.length > 0 ? data[data.length - 1].label : "");
     }
     setDimension(e.target.value);
@@ -105,35 +111,31 @@ export default function Chart() {
     <div>
       <div className={style.filter}>
         <div>
-          维度选择：
-          <Radio.Group onChange={handleDimension} value={dimension}>
-            {[
-              { label: "全部", value: "all" },
+          报表维度：
+          <Radio.Group
+            options={[
               { label: "年", value: "year" },
-            ].map((o) => (
-              <Radio key={o.value} value={o.value}>
-                {o.label}
-              </Radio>
-            ))}
-          </Radio.Group>
+              { label: "月", value: "month" },
+            ]}
+            onChange={handleDimension}
+            value={dimension}
+            optionType="button"
+            buttonStyle="solid"
+          />
         </div>
-        {dimension !== "all" ? (
-          <div>
-            年份选择：
-            <Radio.Group
-              onChange={(e) => setYear(e.target.value)}
-              value={+year}
-            >
-              {yearOptions.map((o) => (
-                <Radio key={o.value} value={o.value}>
-                  {o.label}
-                </Radio>
-              ))}
-            </Radio.Group>
-          </div>
-        ) : null}
+        <div>
+          时间选择：
+          <Radio.Group
+            options={yearOptions}
+            onChange={(e) => setYear(e.target.value)}
+            value={+year}
+            disabled={dimension === "year"}
+            optionType="button"
+            buttonStyle="solid"
+          />
+        </div>
       </div>
-      <Divider />
+      <Divider style={{ margin: "12px 0" }} />
       <div>
         <div className={style.visibleCtrl}>
           <Form

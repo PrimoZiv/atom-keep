@@ -13,10 +13,10 @@ export function getOptions(data, params) {
   let target = data;
   let xAxisUnit = "";
   switch (dimension) {
-    case "all":
+    case "year":
       xAxisUnit = "年";
       break;
-    case "year":
+    case "month":
       if (year) {
         if (+year === -1) {
           target = [];
@@ -35,7 +35,7 @@ export function getOptions(data, params) {
         xAxisUnit = "月";
       }
       break;
-    case "month":
+    case "day":
       const yearData = data.find((y) => y.label === +year).children;
       target = yearData.find((y) => y.label === +month).children;
       xAxisUnit = "日";
@@ -48,6 +48,7 @@ export function getOptions(data, params) {
       name: "支出",
       data: target.map((d) => d.outgo),
       type: "line",
+      showSymbol: false,
     },
   ];
 
@@ -55,9 +56,10 @@ export function getOptions(data, params) {
     name: "收入",
     data: target.map((d) => d.income),
     type: "line",
+    showSymbol: false,
   });
 
-  if (dimension === "year") {
+  if (dimension === "month") {
     const data = target.map((d) => {
       const currentMoment = moment(`${year}-${d.label}-2`);
       if (startTime) {
@@ -71,6 +73,7 @@ export function getOptions(data, params) {
       name: "结余",
       data,
       type: "line",
+      showSymbol: false,
     });
   }
 

@@ -21,6 +21,25 @@ export default ({ refresh }) => {
     e.stopPropagation();
   };
 
+  const demo = `// [年份].json
+  {
+    "outgo": [
+      {
+        "category": "分类",
+        "subCategory": "二级分类",
+        "amount": 10, // 消费金额
+        "account": "招商银行 信用卡",
+        "time": 1609430400000,
+        "remark": "备注",
+        "id": "uuid"
+      }
+    ],
+    "income": [
+      // 同上
+    ]
+  }
+  `;
+
   return (
     <div className={style.container}>
       <div
@@ -28,14 +47,16 @@ export default ({ refresh }) => {
         onDrop={handleDrop}
         onDragOver={handleDragOver}
       >
-        <p>当前路径：{dataDir}</p>
         <p className={style.hint}>拖拽目录到此区域</p>
+        <p>当前路径：{dataDir}</p>
+        <p>数据示例：</p>
+        <pre>{demo}</pre>
       </div>
       <div
         className={`${style.action} ${style.hint}`}
         onDragOver={handleDragOver}
       >
-        拖放「消费-类型」Map文件到这里添加预置数据
+        <p className={style.hint}>拖放「消费-类型」Map文件到这里添加预置数据</p>
       </div>
     </div>
   );

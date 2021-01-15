@@ -42,13 +42,13 @@ export function getOptions(data, params) {
   let labels = [];
   let xAxisUnit = '';
   switch (dimension) {
-    case "all":
+    case "year":
       const { tar, lab } = getCatesFromData(data);
       target = tar;
       labels = lab;
       xAxisUnit = '年';
       break;
-    case "year":
+    case "month":
       if (year) {
         const y = data.find((x) => x.label === year) || {};
         const { tar, lab } = getCatesFromData(y.children || []);
@@ -57,7 +57,7 @@ export function getOptions(data, params) {
         xAxisUnit = '月';
       }
       break;
-    case "month":
+    case "day":
       if (year && month) {
         const y = data.find((x) => x.label === year) || {};
         const m = (y.children || []).find((x) => x.label === month) || {};
