@@ -1,4 +1,5 @@
 import React, { useContext } from "react";
+import { message } from "antd";
 
 import StoreContext from "../modules/context";
 
@@ -14,6 +15,26 @@ export default ({ refresh }) => {
     ipcRenderer.send("data-dir", e.dataTransfer.files[0].path);
     refresh();
     dispatch({ type: "dataDir", payload: e.dataTransfer.files[0].path });
+  };
+
+  const handleMapDrop = (e) => {
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const mapData = JSON.parse(e.target.result);
+          const res = await ipcRenderer.invoke("import-cate", mapData);
+          if (res) {
+            message.success("导入成功");
+          }
+        } catch (e) {
+          message.error("解析文件错误");
+        }
+        console.log(e.target.result);
+      };
+      reader.readAsText(file);
+    }
   };
 
   const handleDragOver = (e) => {
@@ -58,6 +79,7 @@ export default ({ refresh }) => {
       </div>
       <div
         className={`${style.action} ${style.hint}`}
+        onDrop={handleMapDrop}
         onDragOver={handleDragOver}
       >
         <p className={style.hint}>拖放「消费-类型」Map文件到这里添加预置数据</p>

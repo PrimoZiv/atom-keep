@@ -71,6 +71,15 @@ function createWindow() {
     return Promise.resolve(importData(dataDir, data));
   });
 
+  ipcMain.handle("import-cate", async (e, cateMap) => {
+    const outgoMap = store.get("outgoMap");
+    store.set("outgoMap", {
+      ...outgoMap,
+      ...cateMap,
+    });
+    return Promise.resolve(true);
+  });
+
   ipcMain.handle("raw-data", async (e, params) => {
     const dataDir = store.get("dataDir");
     return Promise.resolve(getRawData(dataDir, params));
