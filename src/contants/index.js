@@ -7,6 +7,7 @@ export const outgoTypes = [
   "医疗",
   "旅行",
   "住房",
+  "人情",
   "其他",
 ];
 
