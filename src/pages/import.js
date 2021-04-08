@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useMemo } from "react";
 import {
   Input,
   Radio,
@@ -103,6 +103,16 @@ export default ({ refresh }) => {
   const [outData, setOutData] = useState([]);
   const [inData, setInData] = useState([]);
   const [emailVisible, setEmailVisible] = useState(false);
+
+  const outgoTotal = useMemo(() => {
+    if (!outData || outData.length === 0) {
+      return 0;
+    }
+    if (outData.length === 1) {
+      return outData.amount;
+    }
+    return outData.map((x) => x.amount).reduce((a, b) => a + b);
+  }, [outData]);
 
   const handleImportFromEmail = (data) => {
     handleData(data.content, data.type);
@@ -294,7 +304,7 @@ export default ({ refresh }) => {
             </div>
           ) : null}
           <div className={style.nextStep}>
-            <Button type="primary" onClick={handleData}>
+            <Button type="primary" onClick={() => handleData()}>
               下一步
             </Button>
           </div>
@@ -318,6 +328,10 @@ export default ({ refresh }) => {
               pagination={false}
               dataSource={outData}
             />
+            <p>
+              总计：
+              {outgoTotal.toFixed(2)}
+            </p>
           </div>
           <Button
             className={style.nextStep}
