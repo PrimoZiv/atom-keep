@@ -330,7 +330,7 @@ export default ({ refresh }) => {
             />
             <p>
               总计：
-              {outgoTotal.toFixed(2)}
+              {outgoTotal?.toFixed(2)}
             </p>
           </div>
           <Button
