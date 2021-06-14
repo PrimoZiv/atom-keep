@@ -128,8 +128,8 @@ const Stats = () => {
           break;
         case "day":
           const monthStr = `${year}-${month}-01 00:00:00`;
-          const monthStart = moment(monthStr).startOf("day").valueOf();
-          const monthEnd = moment(monthStr).endOf("day").valueOf();
+          const monthStart = moment(monthStr).startOf("month").valueOf();
+          const monthEnd = moment(monthStr).endOf("month").valueOf();
           const yData = rawData.find((r) => r.label === +year);
           if (yData) {
             const yAll = [...yData.outgo];
